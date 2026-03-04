@@ -1,0 +1,147 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# DotEnv configuration
+.env
+
+# Database
+*.db
+*.rdb
+
+# Pycharm
+.idea
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Spyder
+.spyproject/
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
+
+# Mac OS-specific storage files
+.DS_Store
+
+# vim
+*.swp
+*.swo
+
+# Mypy cache
+.mypy_cache/
+
+# Virtual environment
+.venv/
+venv/
+
+# Alembic migrations
+app/alembic/versions/*
+!app/alembic/versions/.gitkeep
+
+# Launchpad playground
+playground/*.png
+
+app/google-service-account.json
+
+# Project specific
+logs/
+data/cache/
+qdrant_storage/
+es_data/
+*.log
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+frontend/dist/
+
+# ============================================
+# Project-specific ignores (after refactor)
+# ============================================
+
+# Logs
+logs/
+*.log
+fetch.log
+
+# Test results
+tests/results/*.txt
+
+# Data cache
+data/cache/
+
+# Vector databases (local storage)
+qdrant_storage/
+es_data/
+
+.claude
+
+# Ruff cache
+.ruff_cache/
+
+# Downloaded PDFs (optional - uncomment if you don't want to commit PDFs)
+# data/raw/pdfs/
+
+# Processed data (optional - uncomment if files are too large)
+# data/processed/*.json
+
+# AI Assistant artifacts
+.sisyphus/
+.boulder.json

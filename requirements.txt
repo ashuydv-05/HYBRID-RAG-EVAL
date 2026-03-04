@@ -1,0 +1,59 @@
+# arXiv Research Assistant - Backend Requirements
+
+# FastAPI and server dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+sse-starlette>=1.6.0
+
+# Core dependencies
+python-dotenv>=1.0.0
+dataclasses-json>=0.6.0
+
+# Vector database and search
+qdrant-client[fastembed]>=1.7.0
+elasticsearch>=8.0.0,<9.0.0
+
+# Embeddings and ML
+sentence-transformers>=2.2.0
+torch>=2.0.0
+
+# LangChain and agent dependencies
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-community>=0.0.20
+langgraph>=0.2.0
+openai>=1.0.0
+
+# Document processing
+PyPDF2>=3.0.0
+docling>=1.0.0
+docling-core>=1.0.0  # For HybridChunker
+
+# Utilities
+requests>=2.31.0
+tqdm>=4.66.0
+loguru>=0.7.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+hypothesis>=6.92.0
+
+# Monitoring & Tracing
+langfuse>=3.0.0
+
+# Evaluation
+ragas>=0.1.0
+deepeval>=0.21.0
+easyocr
+
+# Web search
+tavily-python>=0.3.0
+langchain-tavily>=0.1.0
+
+# Context compression
+llmlingua>=0.2.0

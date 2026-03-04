@@ -1,0 +1,953 @@
+[
+  {
+    "query_id": "q3",
+    "query": "What is BERT?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.8888888888888888,
+      "answer_relevancy": 0.600029539668259,
+      "context_precision": 0.0,
+      "answer_similarity": 0.6144580443447673,
+      "total_score": 0.5258441182254787
+    },
+    "api_response": {
+      "answer": "BERT (Bidirectional Encoder Representations from Transformers) is a deep, bidirectional language‑understanding model built on the Transformer architecture (Vaswani et al., 2017). It is pre‑trained on large text collections—specifically the BooksCorpus (≈ 800 M words) and English Wikipedia (≈ 2.5 B words)—using two self‑supervised objectives:  \n\n* **Masked Language Modeling (MLM)** – 15 % of tokens are randomly masked and the model learns to predict the original tokens.  \n* **Next Sentence Prediction (NSP)** – given a first sentence, the model predicts whether a second sentence actually follows it in the original text.  \n\nDuring pre‑training BERT learns special tokens such as **[CLS]** (used for classification) and **[SEP]** (sentence separator), as well as segment embeddings for sentence A/B. After pre‑training, BERT can be fine‑tuned on downstream tasks by adding a single task‑specific output layer on top of the contextual token representations (denoted \\(T_i\\) for token i) while keeping the vast majority of parameters frozen (Figure 4 in the original BERT paper). This design allows only a minimal number of new parameters to be learned from scratch for each task, whether the task is sequence‑level (e.g., classification) or token‑level (e.g., named‑entity recognition).  \n\nIn summary, BERT is a Transformer‑based, bidirectional pretrained language model that leverages MLM and NSP objectives to acquire deep contextual representations, which can then be efficiently adapted to a wide range of natural‑language‑processing tasks through lightweight fine‑tuning (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q1",
+    "query": "What is the transformer architecture?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.75,
+      "answer_relevancy": 0.5885645085540779,
+      "context_precision": 0.699999999965,
+      "answer_similarity": 0.7604801355755582,
+      "total_score": 0.699761161023659
+    },
+    "api_response": {
+      "answer": "The Transformer is a neural‑network architecture for processing sequences that relies primarily on **self‑attention** rather than recurrence or convolution.  \n\n* **Core idea** – each element of a sequence is replaced by a weighted average of all other elements, where the weights are computed by the self‑attention mechanism (the “variant of attention” described in the original Transformer paper) [5].  \n* **Structure** – the original model is built as an **encoder‑decoder stack**: a series of identical layers (the “blocks”) in the encoder and a corresponding series in the decoder. Each block contains multi‑head self‑attention followed by a position‑wise feed‑forward network [1][5].  \n* **Parameterization** – a Transformer model is typically described by three hyper‑parameters:  \n  * **L** – the number of layers (Transformer blocks) in the stack,  \n  * **H** – the hidden dimension (size of the token representations), and  \n  * **A** – the number of self‑attention heads per layer [2][3].  \n  For example, BERT‑BASE uses L = 12, H = 768, A = 12 (≈110 M parameters), while BERT‑LARGE uses L = 24, H = 1024, A = 16 (≈340 M parameters) [3].  \n\n* **Variants** – Modern NLP often adapts the basic design:  \n  * **Encoder‑only** models (e.g., BERT, RoBERTa) use only the encoder stack for tasks such as classification and span prediction,  \n  * **Decoder‑only** models (e.g., GPT‑2, GPT‑3) use a stack of Transformer decoders for autoregressive language modeling, and  \n  * **Unified** encoder‑decoder or single‑stack models are also explored for text‑to‑text transfer learning [4][5].  \n\nIn summary, the Transformer architecture is a stack of layers built around multi‑head self‑attention and feed‑forward sub‑layers, parameterized by the number of layers (L), hidden size (H), and attention heads (A), and can be arranged as encoder‑only, decoder‑only, or encoder‑decoder configurations for a wide range of NLP tasks [1][2][3][4][5].",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q5",
+    "query": "What is the attention mechanism?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.822209492623347,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.6395498689651827,
+      "total_score": 0.7821065070587991
+    },
+    "api_response": {
+      "answer": "The attention mechanism is a neural‑network component that lets a model dynamically weight and combine information from different positions in a sequence (or from different nodes in a graph) when producing each output element.  \n\n* **Global dependency modeling** – By computing similarity scores between a query (the element being processed) and all possible keys (the other elements), attention can capture relationships **independent of their distance** in the input or output sequences, enabling the model to draw **global dependencies** rather than only local ones (“Attention Is All You Need”).  \n\n* **Self‑attention** – When the same sequence provides both queries and keys, the mechanism is called *self‑attention*. It produces a set of attention scores (often called *self‑attention scores* or *weights*) that indicate how much each element should “pay attention” to every other element. These scores are then used to compute a weighted sum of the corresponding value vectors, yielding a new representation that integrates contextual information from the whole sequence (“Attention Is All You Need”; “Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”).  \n\n* **Multi‑head formulation** – The mechanism is typically split into several independent “heads.” Each head learns its own set of query, key, and value projections, allowing the model to capture different types of relationships (e.g., syntactic, semantic, anaphoric) in parallel. The outputs of all heads are concatenated before further processing (“Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”).  \n\n* **Application to graphs** – In graph‑based models, a self‑attention mask can be generated from the attention scores to highlight important interactions among nodes. For example, the SAG pooling method computes self‑attention scores from a graph convolutional network (GCN) and uses them to guide graph coarsening (“Hierarchical Graph Pooling is an Effective Citywide Traffic Condition Prediction Model”).  \n\nIn summary, the attention mechanism provides a way for a model to **selectively focus on relevant parts of the input**, compute context‑aware representations via weighted combinations, and do so efficiently in parallel, without relying on recurrent or convolutional structures.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q4",
+    "query": "What is GPT?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5882352941176471,
+      "answer_relevancy": 0.91088550995292,
+      "context_precision": 0.0,
+      "answer_similarity": 0.7132513479132382,
+      "total_score": 0.5530930379959513
+    },
+    "api_response": {
+      "answer": "GPT (Generative Pre‑trained Transformer) refers to a family of large, autoregressive neural‑network models that are first trained on massive text (and, in newer versions, vision and audio) corpora and then used to generate or understand language (and other modalities).  \n\n* In the GPT‑4 o system, the model is described as “an autoregressive omni model, which accepts as input any combination of text, audio, image, and video and generates any combination of text, audio, and image outputs” and is trained end‑to‑end across text, vision, and audio (GPT‑4 o paper).  \n* Earlier GPT models such as GPT‑3 are presented as “language models” that can perform few‑shot learning, e.g., correcting grammar or solving simple arithmetic tasks without task‑specific training (Language Models are Few‑Shot Learners paper).\n\nThus, GPT denotes a generative, pre‑trained transformer architecture that can be applied to a wide range of tasks—from pure text generation (GPT‑3) to multimodal perception and response (GPT‑4 o). The provided documents do not contain a formal definition of the acronym, but the descriptions above capture the essential nature of GPT models.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q2",
+    "query": "How does self-attention work?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.7687427021811924,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.6859651740516832,
+      "total_score": 0.7803436357198856
+    },
+    "api_response": {
+      "answer": "Self‑attention is a mechanism that lets every element of a sequence *attend* to every other element when a new representation for that element is computed.  \n\n1. **Core operation** – For each position the model forms a *query* vector \\(q_i\\), a *key* vector \\(k_j\\) and a *value* vector \\(v_j\\) (typically linear projections of the same input embedding). The attention logit for the pair *(i, j)* is obtained by a similarity function, most commonly a dot‑product \\(q_i^\\top k_j\\).  \n2. **Position information** – Because the dot‑product is order‑independent (it treats the inputs as a set), Transformers add an explicit position signal.  In the T5 models a simplified relative‑position embedding is used: a learned scalar that depends on the offset \\((j-i)\\) is added to the logit before the softmax ([Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer, 1910.10683]). The same set of 32 offset‑dependent scalars is shared across all layers, while each attention head has its own copy.  \n3. **Masking** – Before the softmax, a mask can be applied to forbid certain positions.  A *fully‑visible* mask leaves all logits unchanged, a *causal* mask blocks attention to future tokens, and a *prefix* mask combines both patterns ([Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer, 1910.10683]).  \n4. **Weight computation** – The masked logits are passed through a softmax, yielding attention weights \\(\\alpha_{ij}\\) that sum to 1 across the source positions *j* for each target position *i*.  \n5. **Aggregation** – The output representation for position *i* is the weighted sum of the value vectors:  \n\\[\n\\text{output}_i = \\sum_j \\alpha_{ij} \\, v_j .\n\\]  \nThus each element is replaced by a *weighted average of the rest of the sequence* ([Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer, 1910.10683]).\n\nAdditional practical details mentioned in the literature:  \n\n* **Efficiency tricks** – Position‑embedding parameters are shared across layers; each head uses its own scalar embeddings.  \n* **Local attention** – For very long sequences the attention can be restricted to a neighbourhood of size *r* around each position, reducing the computational cost while increasing the maximum path length to \\(O(n/r)\\) ([Attention Is All You Need, 1706.03762]).  \n\nIn graph‑based models, the same dot‑product attention scores are interpreted as *self‑attention scores* that guide pooling operations, showing the flexibility of the mechanism beyond text ([Hierarchical Graph Pooling is an Effective Citywide Traffic Condition Prediction Model, 2209.03629]).  \n\nIn summary, self‑attention computes pairwise similarity scores between all positions, optionally augments them with learned relative‑position scalars, applies masks to enforce desired dependencies, normalizes the scores with a softmax, and finally aggregates value vectors using the resulting weights to produce context‑aware representations for each element.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q6",
+    "query": "What is layer normalization?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.42857142857142855,
+      "answer_relevancy": 0.7680470386016472,
+      "context_precision": 0.9999999999,
+      "answer_similarity": 0.6404060975867931,
+      "total_score": 0.7092561411649673
+    },
+    "api_response": {
+      "answer": "Layer normalization is a normal‑isation operation that is applied to the activations of a neural‑network layer in order to stabilise and accelerate training.  \n\n* In the Transformer implementations described in **“Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”** (paper 1910.10683), layer normalization is applied to the input of each sub‑component (self‑attention or feed‑forward) in both the encoder and decoder. The authors use a **simplified version** in which the activations are only rescaled – no additive bias term is included – and the normalisation is placed **outside the residual skip‑connection** (i.e., after the residual addition) (paper 1910.10683).  \n\n* The original Transformer paper **“Attention Is All You Need”** (paper 1706.03762) also uses layer normalization in the same way: each sub‑layer is wrapped by a residual connection, and the output of the residual is passed through a LayerNorm operation, formally written as `LayerNorm(x + Sublayer(x))`.  \n\nThus, layer normalization rescales (and optionally shifts) the hidden activations of a layer, typically after adding the residual connection, providing a consistent scale for the inputs to subsequent layers. In the simplified variant used by the T5 model, only the rescaling is performed and the bias term is omitted.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q7",
+    "query": "What is masked language modeling?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8562641451099511,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.6069862358917564,
+      "total_score": 0.8658125952454269
+    },
+    "api_response": {
+      "answer": "Masked language modeling (MLM) is a self‑supervised pre‑training objective in which a portion of the tokens in an input sequence are deliberately corrupted and the model is trained to recover the original tokens.\n\n* **Random token masking** – A subset of tokens (commonly 15 % of the sequence) is selected at random. In the original BERT implementation, of the selected tokens 80 % are replaced with a special **[MASK]** token, 10 % are left unchanged, and the remaining 10 % are replaced by a randomly chosen vocabulary token (RoBERTa: A Robustly Optimized BERT Pretraining Approach).  \n\n* **Prediction target** – The model receives the masked sequence and must predict the true vocabulary ID of each masked token. The loss is a standard cross‑entropy loss over the masked positions (RoBERTa).  \n\n* **Bidirectional context** – Because the masked token is hidden, the model can attend to both left and right surrounding tokens, enabling a truly bidirectional representation (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).  \n\n* **Denoising formulation** – MLM can be viewed as a denoising auto‑encoding task: the model learns to reconstruct the original text from a corrupted version, which has been shown to yield better downstream performance than plain left‑to‑right language modeling (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).  \n\nIn summary, masked language modeling is a pre‑training task where a random subset of input tokens is masked (or otherwise corrupted) and the model learns to predict the original tokens using the surrounding context, typically optimized with a cross‑entropy loss over the masked positions.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q8",
+    "query": "What is encoder decoder architecture?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.9411764705882353,
+      "answer_relevancy": 0.8909060304840061,
+      "context_precision": 0.9999999999666667,
+      "answer_similarity": 0.5207213506399553,
+      "total_score": 0.8382009629197158
+    },
+    "api_response": {
+      "answer": "The encoder‑decoder architecture is a two‑stage Transformer design in which **one stack of layers (the encoder) first processes the input sequence** and **a second stack of layers (the decoder) then produces the output sequence**.\n\n* **Encoder** – The encoder receives the input symbols \\((x_1,\\dots ,x_n)\\) and, through several layers of self‑attention and point‑wise feed‑forward networks, converts them into a sequence of continuous hidden states \\((z_1,\\dots ,z_n)\\). In the standard Transformer the encoder uses a “fully‑visible” attention mask, allowing each token to attend to any other token in the input (as described in *Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer*).\n\n* **Decoder** – The decoder generates the target symbols \\((y_1,\\dots ,y_m)\\) one at a time. At each step it attends both to the previously generated tokens (using a causal, auto‑regressive mask) and to the encoder’s hidden states, then produces a probability distribution over the next token. This auto‑regressive generation is illustrated in *Attention Is All You Need* and *Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer*.\n\nBoth the encoder and the decoder are built from **stacked self‑attention layers and point‑wise fully‑connected (feed‑forward) layers**, as originally proposed by Vaswani et al. (2017). The overall flow is:\n\n1. **Encode** the source sequence → continuous representations.  \n2. **Decode** using those representations and the previously generated outputs → next token prediction, repeated until the sequence is complete.\n\nThis architecture can be trained with different objectives (e.g., denoising, language modeling) and has been shown to perform well across generative and classification tasks (*Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer*).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q9",
+    "query": "What is positional encoding?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.7777777777777778,
+      "answer_relevancy": 0.7530099170996799,
+      "context_precision": 0.99999999995,
+      "answer_similarity": 0.6370184972103307,
+      "total_score": 0.7919515480094471
+    },
+    "api_response": {
+      "answer": "Positional encoding is a technique used in transformer models to give the network information about the order of tokens in a sequence, since the core attention mechanism itself has no notion of position. The encoding is added to the input token embeddings at the bottom of both the encoder and decoder stacks so that each token’s representation combines its lexical meaning with a signal about where it occurs in the sequence (Attention Is All You Need).\n\nTwo main forms are described:\n\n* **Sinusoidal positional encodings** – each dimension of the encoding is a sine or cosine function of the token’s position \\(pos\\) with a different frequency. Formally, for dimension \\(i\\):  \n  \\[\n  \\text{PE}_{(pos,2i)} = \\sin\\!\\big(pos / 10000^{2i/d_{\\text{model}}}\\big),\\qquad\n  \\text{PE}_{(pos,2i+1)} = \\cos\\!\\big(pos / 10000^{2i/d_{\\text{model}}}\\big)\n  \\]  \n  (Attention Is All You Need). The wavelengths form a geometric progression from \\(2\\pi\\) to \\(10000\\cdot2\\pi\\). This design allows the model to easily learn relative‑position relationships because a shift by a fixed offset \\(k\\) corresponds to a linear transformation of the encoding.\n\n* **Learned positional embeddings** – the positions are represented by trainable vectors, similar to word embeddings (also mentioned in the same paper). Experiments showed that learned and sinusoidal encodings give nearly identical performance, but the sinusoidal version is preferred for its potential to extrapolate to sequence lengths longer than those seen during training (Attention Is All You Need).\n\nIn practice, the positional encoding vector (of the same dimensionality \\(d_{\\text{model}}\\) as the token embeddings) is summed with the token embedding before being fed into the transformer layers. This combined representation enables the model to attend to tokens while respecting their relative and absolute positions in the sequence.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q10",
+    "query": "What is the scaled dot-product attention?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.75,
+      "answer_relevancy": 0.8440621102052289,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.7017897791971042,
+      "total_score": 0.8239629723455832
+    },
+    "api_response": {
+      "answer": "**Scaled dot‑product attention** is the core attention mechanism used in the Transformer architecture.  \n\n1. **Inputs** – Three matrices are derived from the same input sequence (or from separate encoder‑decoder streams):  \n\n   * **Query matrix** \\(Q\\) (dimension \\(n \\times d_k\\))  \n   * **Key matrix** \\(K\\) (dimension \\(m \\times d_k\\))  \n   * **Value matrix** \\(V\\) (dimension \\(m \\times d_v\\))  \n\n   The matrices are obtained by multiplying the input sequence \\(X\\) with learned weight matrices \\(W_Q\\), \\(W_K\\) and \\(W_V\\) respectively (SACDNet: “Q, K, and V represent the query, key, and value matrices…”).\n\n2. **Compatibility scores** – For each query vector, a dot product is taken with every key vector, producing a raw score matrix:  \n\n   \\[\n   S = QK^{\\top}\n   \\]\n\n3. **Scaling** – To keep the magnitude of the dot products stable when the key dimension \\(d_k\\) is large, each score is divided by \\(\\sqrt{d_k}\\):  \n\n   \\[\n   \\hat{S} = \\frac{QK^{\\top}}{\\sqrt{d_k}}\n   \\]\n\n   The scaling prevents the softmax from entering regions with extremely small gradients, which can happen for large \\(d_k\\) (Attention Is All You Need, “we scale the dot products by \\(\\sqrt{1/d_k}\\)”).\n\n4. **Softmax weighting** – A softmax function is applied row‑wise to the scaled scores, turning them into attention weights that sum to 1:  \n\n   \\[\n   A = \\text{softmax}\\!\\left(\\hat{S}\\right)\n   \\]\n\n   In the decoder, illegal future positions are masked by setting the corresponding logits to \\(-\\infty\\) before the softmax, preserving the auto‑regressive property (Attention Is All You Need, “masking out … all values … that correspond to illegal connections”).\n\n5. **Output** – The attention weights are used to compute a weighted sum of the value vectors:  \n\n   \\[\n   \\text{Attention}(Q,K,V) = A V\n   \\]\n\n   This yields a new representation for each query position that aggregates information from all (or a masked subset of) positions in the sequence.\n\n6. **Properties** – Compared with additive (or “Bahdanau”) attention, dot‑product attention can be implemented entirely with matrix multiplications, making it faster and more memory‑efficient. The scaling factor \\(\\frac{1}{\\sqrt{d_k}}\\) is crucial for large \\(d_k\\) to avoid saturation of the softmax (Attention Is All You Need, “dot‑product attention is much faster … we scale the dot products by \\(\\sqrt{1/d_k}\\)”).  \n\nIn summary, scaled dot‑product attention computes similarity between queries and keys via dot products, scales those similarities by \\(\\sqrt{d_k}\\) to maintain stable gradients, normalizes them with a softmax (optionally masked), and uses the resulting weights to blend the value vectors into a contextual output (Attention Is All You Need; SACDNet).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q13",
+    "query": "What is bidirectional processing?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.6780308798512604,
+      "context_precision": 0.699999999965,
+      "answer_similarity": 0.5490821255474446,
+      "total_score": 0.7317782513409262
+    },
+    "api_response": {
+      "answer": "Bidirectional processing means that a model learns representations by **conditioning on both the left‑hand (preceding) and right‑hand (following) context of each token simultaneously**. In BERT, this is achieved by pre‑training deep bidirectional representations in which every layer attends to the entire surrounding text rather than only the past (as in unidirectional models). Consequently, the model can capture information from both directions of the sequence when forming its internal representations (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q11",
+    "query": "How does multi-head attention work?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.9705882352941176,
+      "answer_relevancy": 0.8239420046491714,
+      "context_precision": 0.7555555555303703,
+      "answer_similarity": 0.6796078904731889,
+      "total_score": 0.8074234214867121
+    },
+    "api_response": {
+      "answer": "Multi‑head attention is a core component of the Transformer architecture.  \nIt builds on the scaled dot‑product attention primitive but runs several copies of it **in parallel**, each on a different linear projection of the same input sequence.\n\n### 1. Projecting queries, keys and values  \n\nFor each token the model first creates three vectors – a **query (Q)**, a **key (K)** and a **value (V)**.  \nInstead of using a single set of Q, K and V vectors of dimension *d*₍model₎, the Transformer **linearly projects** the input **h** times with separate learned matrices:\n\n* Q → Q₁, Q₂,…, Q_h  (each of dimension d_k)  \n* K → K₁, K₂,…, K_h  (each of dimension d_k)  \n* V → V₁, V₂,…, V_h  (each of dimension d_v)  \n\n(“Instead of performing a single attention function … we found it beneficial to linearly project the queries, keys and values h times …” – *Attention Is All You Need*).\n\n### 2. Independent attention heads  \n\nEach triplet (Q_i, K_i, V_i) is fed to a **scaled dot‑product attention** operation:\n\n\\[\n\\text{Attention}(Q_i,K_i,V_i)=\\text{softmax}\\!\\left(\\frac{Q_i K_i^{\\top}}{\\sqrt{d_k}}\\right)V_i\n\\]\n\nAll h heads compute this in parallel, producing h output vectors of dimension d_v.\n\n### 3. Concatenation and final linear projection  \n\nThe h per‑head output vectors are **concatenated** along the feature dimension, yielding a vector of size h·d_v.  \nA final learned linear projection maps this concatenated vector back to the model dimension d_model, producing the multi‑head attention output for the token.\n\n(“…we then perform the attention function in parallel, yielding d_v‑dimensional output values. These are concatenated and once again projected, resulting in the final values…” – *Attention Is All You Need*).\n\n### 4. Why use multiple heads?  \n\nA single attention head averages over all similarity patterns, which can wash out useful signals.  \nMultiple heads allow the model to **jointly attend to information from different representation subspaces** and at different positions, giving each head the capacity to focus on distinct aspects of the input (e.g., syntactic vs. semantic relations).  \n\n(“…Multi‑head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.” – *Attention Is All You Need*).\n\n### 5. Places where it is applied  \n\n* **Encoder self‑attention** – Queries, keys and values all come from the same encoder layer output, letting every encoder position attend to all others.  \n* **Decoder self‑attention** – Same as encoder self‑attention but with a causal mask so a position cannot attend to future positions.  \n* **Encoder‑decoder (cross) attention** – Queries come from the decoder, while keys and values come from the encoder output, enabling each decoder position to attend over the whole source sequence.  \n\n(Descriptions of these three uses are given in the paper’s sections on encoder‑decoder attention and self‑attention – *Attention Is All You Need*).\n\n### Summary  \n\nMulti‑head attention works by (1) projecting the input into multiple query/key/value subspaces, (2) applying scaled dot‑product attention independently in each subspace, (3) concatenating the per‑head results, and (4) projecting back to the model dimension. This parallelism lets the model capture a richer set of relationships than a single attention head could, and it is employed throughout the Transformer in encoder self‑attention, decoder self‑attention, and encoder‑decoder attention.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q12",
+    "query": "What is the role of feed-forward networks?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.863138814820181,
+      "context_precision": 0.249999999975,
+      "answer_similarity": 0.40949044807614915,
+      "total_score": 0.5473239823844992
+    },
+    "api_response": {
+      "answer": "Feed‑forward networks are the basic computational building blocks that turn raw inputs into learned representations and predictions.  In the papers cited, they serve several related purposes:\n\n* **Function approximation and PDE solution** – In the physics‑informed neural‑network study of steady unconfined groundwater flow, a fully‑connected feed‑forward network (five hidden layers, 20 neurons each) maps the spatial coordinate *x* and source term *q* to the hydraulic head *h*.  Its output is automatically differentiated to form the PDE‑misfit term of the loss, allowing the network to learn a solution that satisfies both data and governing equations (Investigating Steady Unconfined Groundwater Flow using Physics Informed Neural Networks).\n\n* **Component of Transformer blocks** – In the T5‑style “Unified Text‑to‑Text Transformer”, each Transformer block contains a feed‑forward network consisting of a dense layer (dimension *dff* = 3072), a ReLU non‑linearity, and a second dense layer.  This sub‑layer processes the token representations after self‑attention, providing the non‑linear transformation that enriches the model’s expressive power (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).\n\n* **Adapter layers for transfer learning** – Adapter layers are added **after** the existing feed‑forward networks in every Transformer block.  They are small dense‑ReLU‑dense modules whose input and output dimensions match, enabling most of the original model to stay frozen while only the adapters and layer‑norm parameters are fine‑tuned.  Thus the feed‑forward networks act as anchor points around which lightweight, trainable adapters are inserted (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).\n\n* **Digital‑twin surrogate models** – In the ensemble digital‑twin framework, each surrogate (digital twin) is implemented as a three‑layer feed‑forward neural network with ReLU activations.  These networks learn mappings from system states to quantities of interest (e.g., pump degradation severity) and are stored for later retrieval in the transient diagnostic system (ADVANCED TRANSIENT DIAGNOSTIC WITH ENSEMBLE DIGITAL TWIN MODELING).\n\nOverall, feed‑forward networks provide the non‑linear mapping capability needed to (i) approximate complex physical fields, (ii) enrich Transformer representations, (iii) enable parameter‑efficient fine‑tuning via adapters, and (iv) serve as compact surrogate models in digital‑twin applications.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q15",
+    "query": "What is dropout?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.625,
+      "answer_relevancy": 0.7736031005914775,
+      "context_precision": 0.5833333333041666,
+      "answer_similarity": 0.712712696573832,
+      "total_score": 0.673662282617369
+    },
+    "api_response": {
+      "answer": "Dropout is a regularization technique for neural networks that randomly “drops out” — i.e., temporarily omits — a subset of the network’s weights and biases during each training step. By stochastically removing connections, dropout prevents the model from relying too heavily on any particular neuron, thereby reducing over‑fitting and improving generalization. The method was introduced as a simple way to prevent neural networks from overfitting (Srivastava et al., 2014) and is often used alongside other regularizers such as L¹ or L² weight penalties (Goodfellow et al., 2016).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q16",
+    "query": "What is label smoothing?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5714285714285714,
+      "answer_relevancy": 0.9480338473418479,
+      "context_precision": 0.7499999999625,
+      "answer_similarity": 0.765366516683823,
+      "total_score": 0.7587072338541856
+    },
+    "api_response": {
+      "answer": "Label smoothing is a training technique in which the hard, one‑hot target labels are softened by distributing a small amount of probability mass to the non‑target classes.  In practice a smoothing value ε (e.g., ε = 0.1) is subtracted from the probability assigned to the true class and the remainder is spread uniformly over the other classes.  This makes the model “less sure” about its predictions, which can degrade metrics that favor sharp distributions (such as perplexity) but typically leads to higher downstream accuracy and BLEU scores (Attention Is All You Need).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q14",
+    "query": "What is next sentence prediction?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.6145791343691497,
+      "context_precision": 0.999999999975,
+      "answer_similarity": 0.586772608712328,
+      "total_score": 0.8003379357641194
+    },
+    "api_response": {
+      "answer": "**Next Sentence Prediction (NSP)** is a pre‑training objective introduced for BERT‑style language models that teaches the model to understand the relationship between two text segments.\n\n* **Task definition** – NSP is a binary classification problem in which the model receives two sentences (or text spans) A and B and must predict whether B is the actual sentence that follows A in the original document.  \n  * If B is the true next sentence, the example is labeled **IsNext** (positive).  \n  * If B is a randomly sampled sentence from elsewhere in the corpus, the example is labeled **NotNext** (negative).  \n\n* **Data construction** – For each pre‑training example, the two spans are sampled so that their combined length ≤ 512 tokens. 50 % of the time B is the true continuation of A, and 50 % of the time B is a random sentence (BERT) or a segment taken from a different document (RoBERTa). Positive and negative examples are therefore sampled with equal probability.  \n\n  *BERT*: “50 % of the time B is the actual next sentence that follows A (labeled as **IsNext**), and 50 % of the time it is a random sentence from the corpus (labeled as **NotNext**)” (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).  \n  *RoBERTa*: “Positive examples are created by taking consecutive sentences from the text corpus. Negative examples are created by pairing segments from different documents. Positive and negative examples are sampled with equal probability.” (RoBERTa: A Robustly Optimized BERT Pretraining Approach).\n\n* **Model architecture** – In BERT the special vector **C** (the pooled output of the [CLS] token) is fed into a binary classifier that predicts the NSP label. The vector itself is not a meaningful sentence representation until fine‑tuning, because it is trained solely for this binary task.\n\n* **Purpose and impact** – NSP supplements the masked language modeling objective by providing a signal about inter‑sentence coherence, which is helpful for downstream tasks that rely on sentence‑level reasoning such as Question Answering and Natural Language Inference. The original BERT paper reports that the final model attains **97 %–98 % accuracy** on the NSP task, demonstrating that the model learns this relationship well.\n\nIn summary, next sentence prediction is a simple yet effective pre‑training task that asks a model to decide whether two given sentences occur consecutively in the source text, thereby encouraging the model to capture discourse‑level information.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q18",
+    "query": "Why are transformers parallelizable?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.6363636363636364,
+      "answer_relevancy": 0.8266021636003278,
+      "context_precision": 0.6388888888675925,
+      "answer_similarity": 0.5777458818999388,
+      "total_score": 0.6699001426828739
+    },
+    "api_response": {
+      "answer": "Transformers can be trained and run in parallel because their architecture removes the sequential dependencies that limit earlier models.  The original Transformer design “dispenses with recurrence and convolutions entirely” and relies only on attention mechanisms (Attention Is All You Need).  Since self‑attention computes relationships between all token positions at once, the computation for each layer can be performed simultaneously for every token, rather than step‑by‑step as in recurrent or convolutional networks.  This lack of recurrence makes the model far more parallelizable and reduces training time.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q20",
+    "query": "How many layers does the original transformer have?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8383033369698526,
+      "context_precision": 0.99999999995,
+      "answer_similarity": 0.8809066827970198,
+      "total_score": 0.9298025049292181
+    },
+    "api_response": {
+      "answer": "The original Transformer model is built from two separate stacks – an encoder stack and a decoder stack – and each stack contains **six identical layers**. Consequently, the full model comprises **six encoder layers and six decoder layers (12 layers in total)**【1】,【2】.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q21",
+    "query": "What is the purpose of residual connections?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5,
+      "answer_relevancy": 0.7523321267647045,
+      "context_precision": 0.0,
+      "answer_similarity": 0.6301004864199636,
+      "total_score": 0.470608153296167
+    },
+    "api_response": {
+      "answer": "Residual connections are inserted around each sub‑layer (both in the encoder and the decoder) so that the original input to a sub‑layer can be added to its transformed output before layer‑normalization is applied. This shortcut pathway helps preserve the original representation, eases the flow of gradients, and makes it possible to train the deep stack of six identical layers in the Transformer architecture more stably (Attention Is All You Need, Encoder [paper ID 1706.03762]; Decoder [paper ID 1706.03762]).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q17",
+    "query": "What is learning rate warmup?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5714285714285714,
+      "answer_relevancy": 0.8842215035762173,
+      "context_precision": 0.9999999999,
+      "answer_similarity": 0.7282481937683614,
+      "total_score": 0.7959745671682875
+    },
+    "api_response": {
+      "answer": "Learning‑rate warmup is a short initial phase of training during which the optimizer’s learning‑rate is deliberately set to rise from a very small value (or stay constant) for a predetermined number of steps before the regular learning‑rate schedule takes over.\n\n* In the original Transformer paper, the schedule “increases the learning rate linearly for the first *warmup* _steps training steps, and decreasing it thereafter proportionally to the inverse square root of the step number” (Attention Is All You Need).  \n* In the T5 pre‑training work, a “warm‑up steps” parameter k = 10⁴ is used: the schedule is defined as 1 / √max(n, k). For the first 10⁴ steps (the warm‑up period) the learning rate stays at a constant 0.01, after which it decays (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).  \n* Other papers report warm‑up as a fraction of training (e.g., a warm‑up ratio of 0.06 in RoBERTa finetuning) or as a count of tokens (250 k warm‑up tokens in the LoRA adaptation study).\n\nThus, warmup is a technique that temporarily modifies the learning‑rate curve—typically by linearly ramping it up or holding it steady—for a limited number of steps/tokens/epochs, after which the standard decay schedule (inverse‑square‑root, cosine, linear, etc.) is applied. This helps stabilize early training and prevents divergence when the model parameters are still untrained.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q19",
+    "query": "What is the difference between encoder and decoder?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.8235294117647058,
+      "answer_relevancy": 0.6511994335059825,
+      "context_precision": 0.9166666666361111,
+      "answer_similarity": 0.5770087180866381,
+      "total_score": 0.7421010574983594
+    },
+    "api_response": {
+      "answer": "**Encoder versus Decoder in the Transformer architecture**\n\n| Aspect | Encoder | Decoder |\n|--------|---------|----------|\n| **Primary role** | Converts the input token sequence into a set of contextual hidden representations that capture relationships among all input positions. | Generates the output sequence token‑by‑token, using the encoder’s representations as a source of information. |\n| **Self‑attention pattern** | *Full* self‑attention: every position can attend to every other position in the same layer (no masking). | *Masked* self‑attention: a causal mask prevents a position *i* from attending to any later position *j > i*, ensuring that predictions for position *i* depend only on earlier (already generated) tokens. This masking, together with the one‑step offset of the output embeddings, guarantees autoregressive generation (Attention Is All You Need). |\n| **Additional attention sub‑layer** | None; each encoder layer consists of (1) a multi‑head self‑attention sub‑layer and (2) a feed‑forward network. | Each decoder layer contains **three** sub‑layers: <br>1. masked multi‑head self‑attention, <br>2. **encoder‑decoder (cross) attention** that attends to the full set of encoder outputs, <br>3. a feed‑forward network. The extra cross‑attention allows the decoder to condition its generation on the encoded source (Attention Is All You Need). |\n| **Residual connections & layer‑norm** | Applied around each of the two sub‑layers (self‑attention and feed‑forward). | Applied around each of the three sub‑layers (masked self‑attention, encoder‑decoder attention, and feed‑forward). |\n| **Use as a stand‑alone model** | Not designed to generate sequences on its own; it only produces contextual embeddings. | A decoder‑only stack (i.e., without an encoder) can be used as a language model that predicts the next token given previous tokens (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer). |\n| **Parameter sharing (optional)** | In the baseline T5‑style model, encoder and decoder each have 12 blocks with identical size (dmodel = 768, 12 heads, etc.) (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer). | Same block size as the encoder but includes the extra cross‑attention sub‑layer; when parameters are shared across encoder and decoder the total parameter count is halved (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer). |\n\n**Key conceptual difference**\n\n- The **encoder** is a *bidirectional* processor that builds a rich, context‑aware representation of the whole input sequence.\n- The **decoder** is a *unidirectional* (autoregressive) generator that must respect the causal order of output tokens, therefore it masks future positions and incorporates an additional attention mechanism to attend to the encoder’s output.\n\nTogether, the encoder‑decoder pair enables sequence‑to‑sequence tasks such as translation, summarization, or any conditional text generation.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q22",
+    "query": "What is the attention formula?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.6703346621570593,
+      "context_precision": 0.8055555555287036,
+      "answer_similarity": 0.6761571532412188,
+      "total_score": 0.704678509398412
+    },
+    "api_response": {
+      "answer": "The standard attention computation used in the Transformer architecture is the **scaled‑dot‑product attention**:\n\n\\[\n\\text{Attention}(Q, K, V)\\;=\\;\\text{softmax}\\!\\Bigl(\\frac{Q\\,K^{\\top}}{\\sqrt{d_k}}\\Bigr)\\;V\n\\]\n\nwhere  \n\n* \\(Q\\) (queries), \\(K\\) (keys) and \\(V\\) (values) are matrices obtained by linearly projecting the input sequence,  \n* \\(d_k\\) is the dimensionality of the keys (and queries), and  \n* the softmax is applied row‑wise to produce the attention weights that are then used to weight the values \\(V\\).  \n\nThis formulation is described in *Attention Is All You Need* (the original Transformer paper) and is also referenced in the discussion of self‑attention in *SACDNet: Towards Early Type 2 Diabetes Prediction with Uncertainty for Electronic Health Records* (both papers present the same scaled dot‑product attention equation).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q25",
+    "query": "What is transfer learning?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.625,
+      "answer_relevancy": 0.9999999999997217,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.7360535939841532,
+      "total_score": 0.8402633984909686
+    },
+    "api_response": {
+      "answer": "Transfer learning is a machine‑learning approach in which knowledge acquired on one (often large, data‑rich) source task or domain is reused to improve performance on a different target task.  The idea is to “transfer” the representations, parameters, or other learned structure from the source—sometimes even when the source and target have different feature spaces or data distributions—so that the target task can be learned more quickly or with less data (REINFORCEMENT LEARNING IN PRACTICE: OPPORTUNITIES AND CHALLENGES).  In practice, this is typically done by first pre‑training a model on a massive, generic task (e.g., language modeling on billions of tokens) and then fine‑tuning it on a downstream, often more specialized task (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q23",
+    "query": "What is pre-training?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.8333333333333334,
+      "answer_relevancy": 0.7127602202249513,
+      "context_precision": 0.5333333333155555,
+      "answer_similarity": 0.5569505542847022,
+      "total_score": 0.6590943602896356
+    },
+    "api_response": {
+      "answer": "**Pre‑training** is the initial stage in which a language model is trained on a large, broadly‑covering collection of data (e.g., Wikipedia, web‑crawled corpora) before it is ever exposed to any specific downstream task. In this stage the model **stores** patterns, facts, and linguistic structures in its parameters, creating a general‑purpose knowledge base that can later be **accessed** when the model is fine‑tuned for a particular application such as sentiment classification, information extraction, or text generation.\n\nKey points from the provided papers:\n\n1. **Data‑centric view** – The authors of *reStructured Pre‑training* (2206.11147) treat pre‑training as a **data‑storing process**. The model ingests a massive, restructured dataset that unifies many signal types (e.g., entities, relations) from multiple sources, thereby creating a “storage mechanism” that makes the expected data easy to retrieve later.  \n2. **Unified paradigm** – This paradigm unifies pre‑training and downstream fine‑tuning as two sides of the same data‑access workflow: pre‑training stores the data, while downstream training **accesses** it (2206.11147).  \n3. **Multi‑task pre‑training** – In the T5 paper (*Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer*, 1910.10683) pre‑training can involve a mixture of unsupervised and supervised tasks, allowing the model to learn from both raw text and labeled examples before any task‑specific fine‑tuning.  \n4. **Purpose and outcome** – The goal of pre‑training is to endow the model with a broad, generalizable understanding that can be leveraged without (or with minimal) additional fine‑tuning, leading to strong performance across many NLP benchmarks (e.g., 52/55 datasets in the RST experiments).\n\nThus, pre‑training is the foundational learning phase where a model **captures and stores** large‑scale linguistic knowledge from raw or structured data, preparing it for efficient **access** during downstream task learning.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q24",
+    "query": "What is fine-tuning?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.8888888888888888,
+      "answer_relevancy": 0.7763986305844833,
+      "context_precision": 0.8041666666465626,
+      "answer_similarity": 0.7158654667732851,
+      "total_score": 0.7963299132233049
+    },
+    "api_response": {
+      "answer": "Fine‑tuning is the procedure of taking a model that has already been pre‑trained on a large, generic corpus and then **updating its weights by training it on a supervised dataset that is specific to the downstream task**. In practice this means continuing the optimization of the pre‑trained parameters with thousands to hundreds of thousands of labeled examples for the target task. The approach is widely used because it usually yields strong performance on many benchmarks.  \n\nKey characteristics described in the literature include:\n\n* **Task‑specific supervision** – the model is trained on a dataset that directly reflects the desired task (e.g., GLUE or SuperGLUE tasks) ([1] “Fine‑Tuning (FT)… involves updating the weights of a pre‑trained model by training on a supervised dataset specific to the desired task.”).  \n* **Data requirements** – fine‑tuning typically needs a relatively large labeled set (thousands to hundreds of thousands of examples) ([1]).  \n* **Advantages** – it provides strong benchmark performance and can be applied to many downstream problems.  \n* **Disadvantages / risks** – each new task requires its own large dataset; the resulting model may generalize poorly to out‑of‑distribution inputs; it can latch onto spurious features in the fine‑tuning data, leading to unfair human‑vs‑model comparisons ([1]).  \n* **Practical considerations** – when fine‑tuning many low‑resource tasks, researchers may use smaller batch sizes and more frequent checkpointing to avoid over‑fitting ([2]); alternative strategies such as “gradual unfreezing” can be employed, where only a subset of the model’s layers are unfrozen and updated over time ([4]).\n\nThus, fine‑tuning is a supervised adaptation step that refines a pre‑trained model’s parameters for a specific task, balancing strong performance against the need for task‑specific labeled data and potential over‑fitting concerns.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q26",
+    "query": "What is the [CLS] token in BERT?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9090181267009035,
+      "context_precision": 0.8041666666465626,
+      "answer_similarity": 0.572682115616755,
+      "total_score": 0.8214667272410553
+    },
+    "api_response": {
+      "answer": "The **[CLS] token** is a special “classification” token that BERT inserts at the very beginning of every input sequence.  \n\n* **Position and purpose** – Because it occupies the first position, the hidden state that emerges for this token after the last transformer layer is intended to serve as a *single, aggregate representation* of the whole sentence (or pair of sentences). This representation is then fed to a downstream classifier (e.g., a linear layer) to produce the final prediction for tasks such as sentiment analysis, natural‑language inference, question‑answer matching, etc. (Understanding the `[CLS]` Token in BERT: A Comprehensive Guide).\n\n* **How it works** – As the sequence passes through all BERT layers, the `[CLS]` token “captures the overall meaning” of the input. For single‑sentence tasks it encodes the sentence‑level meaning; for sentence‑pair tasks it encodes the combined meaning of both sentences, enabling the model to decide entailment, contradiction, neutrality, etc. (Understanding the `[CLS]` Token in BERT: A Comprehensive Guide).\n\n* **Why it is used instead of averaging all token vectors** – The original BERT paper introduced the `[CLS]` token as the designated aggregate representation. Although an average (or max‑pool) over all token embeddings could also be used, the `[CLS]` token is learned specifically for the pre‑training objectives (masked‑language modeling and next‑sentence prediction) and for downstream fine‑tuning, so it tends to produce a more task‑adapted summary than a simple statistical pooling of the other token vectors (Why Bert transformer uses [CLS] token for classification instead of average over all tokens?).\n\n* **Practical role** – During fine‑tuning, the final hidden state of `[CLS]` is passed to a classification head. For example, in sentiment analysis the `[CLS]` embedding becomes the input to the sentiment classifier, allowing the model to predict the sentiment label (How cls token in BERT contribute to Overall sentiment?).\n\nIn short, the `[CLS]` token is a dedicated, learnable token placed at the start of the input that BERT transforms into a comprehensive sentence‑level embedding, which is then used for classification‑type downstream tasks.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q27",
+    "query": "What is the [SEP] token in BERT?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9328744502323744,
+      "context_precision": 0.8874999999778125,
+      "answer_similarity": 0.6987253320120985,
+      "total_score": 0.8797749455555713
+    },
+    "api_response": {
+      "answer": "The **[SEP] token** is a special “separator” symbol that BERT expects to see in every input sequence.  \n\n* **Purpose** – It marks the boundary between two sentences (or between a sentence and the end of the input). During pre‑training BERT is trained on the *Next Sentence Prediction* (NSP) task, where the model must decide whether a second sentence follows the first one. The presence of a `[SEP]` token tells the encoder where the first sentence stops and the second begins, allowing the model to learn relationships across sentence boundaries.  \n\n* **Single‑sentence use** – Even when a downstream task involves only one sentence (e.g., text classification), the input is still formatted as  \n\n```\n[CLS]  sentence  [SEP]\n```  \n\nThe trailing `[SEP]` signals the end of the sequence. It is retained because the model was never exposed to inputs without it during pre‑training; removing it could confuse the network or degrade performance. (Stack Overflow discussion on “Removing SEP token in Bert for text classification” notes that the token is a relic of the original pre‑training design and helps the model know the input’s end.)\n\n* **Effect on the model** – The token itself carries its own embedding, which after the transformer layers contains a representation of the “separator” position. This representation does **not** add extra semantic information beyond indicating the boundary, but it provides a consistent structural cue that the model has learned to rely on for both NSP and downstream tasks. (Explanation from the Data Science Stack‑Exchange answer “What is the use of [SEP] in paper BERT?”)\n\nIn summary, the `[SEP]` token is a delimiter that:\n\n1. Separates two sentences (or marks the end of a single sentence).  \n2. Enables BERT’s Next Sentence Prediction pre‑training objective.  \n3. Provides a consistent structural marker that the model expects in all inputs, even for single‑sentence tasks.  \n\nThus, `[SEP]` is essentially a **separator** token that tells BERT where one textual segment ends and the next begins (or where the input terminates).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q28",
+    "query": "What is masked LM in BERT?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.875,
+      "answer_relevancy": 0.6603708203780814,
+      "context_precision": 0.8041666666465626,
+      "answer_similarity": 0.736888011400703,
+      "total_score": 0.7691063746063367
+    },
+    "api_response": {
+      "answer": "Masked LM (Masked Language Modeling) is one of the two unsupervised pre‑training tasks used by BERT.  \nDuring pre‑training, a fixed proportion of the input tokens (15 % of all WordPiece tokens) are selected at random and “masked”. For each selected token the masking procedure is:\n\n* **80 %** of the time the token is replaced with the special **[MASK]** token.  \n* **10 %** of the time it is replaced with a random word from the vocabulary.  \n* **10 %** of the time it is left unchanged.  \n\nThe model then tries to predict the original token for each masked position by feeding the final hidden vectors of those positions into a softmax over the whole vocabulary (the “masked LM” objective). This forces BERT to learn deep bidirectional representations, because the prediction for a token can attend to both its left and right contexts (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).  \n\nThus, masked LM in BERT is a cloze‑style task where randomly masked tokens are predicted, using the 80/10/10 masking strategy on 15 % of tokens. (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q31",
+    "query": "What is the decoder-only architecture?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.81646973124903,
+      "context_precision": 0.4166666666458333,
+      "answer_similarity": 0.415521345605242,
+      "total_score": 0.6621644358750263
+    },
+    "api_response": {
+      "answer": "The decoder‑only architecture is a Transformer that consists solely of the decoder stack—there is no separate encoder component. It uses the same number of layers as a standard decoder ( L layers), contains P parameters (the same parameter budget as a 12‑layer base model), and requires M FLOPs to process a sequence. This model is trained as a language model, i.e., it predicts the next token in an autoregressive fashion, feeding each sampled token back into the decoder to generate the subsequent token ([2] “decoder‑only language model with L layers and P parameters and a resulting computational cost of M FLOPs”; [3] “a Transformer decoder (without an encoder) can be used as a language model (LM), i.e. a model trained solely for next‑step prediction”).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q29",
+    "query": "What is RoBERTa?",
+    "expected_paper_ids": [
+      "1907.11692"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.9130434782608695,
+      "answer_relevancy": 0.7197012450228448,
+      "context_precision": 0.4777777777618519,
+      "answer_similarity": 0.7579826261434346,
+      "total_score": 0.7171262817972502
+    },
+    "api_response": {
+      "answer": "RoBERTa (Robustly Optimized BERT Pretraining Approach) is a re‑implementation of the BERT model that improves its pretraining procedure in several systematic ways.  It keeps the same masked‑language‑model (MLM) objective and the same Transformer architecture as BERT (both the BASE and LARGE configurations are used), but it modifies the training pipeline to obtain substantially better downstream performance.\n\nKey characteristics of RoBERTa, as described in the paper “RoBERTa: A Robustly Optimized BERT Pretraining Approach,” are:\n\n| Aspect | What RoBERTa does |\n|--------|-------------------|\n| **Dynamic masking** | Masks tokens on‑the‑fly during each epoch instead of using a static mask pattern (Section 4.1). |\n| **Full‑sentence training** | Trains on whole sentences and removes the next‑sentence‑prediction (NSP) loss (Section 4.2). |\n| **Large mini‑batches** | Uses much larger batch sizes than BERT, increasing the number of sequences seen per optimization step (Section 4.3). |\n| **Byte‑level BPE vocabulary** | Employs a larger byte‑level Byte‑Pair‑Encoding (BPE) tokenization (Section 4.4). |\n| **More data & longer training** | Pretrains on substantially more text (up to 160 GB) and for many more steps (up to 500 K) than the original BERT, thereby seeing many more training passes through the data (Section 3). |\n| **Architecture** | Mirrors BERT‑LARGE (L = 24 layers, H = 1024 hidden size, A = 16 attention heads, ~355 M parameters) or BERT‑BASE, but with the above training changes (Table 8, Table 9). |\n\nThese modifications collectively allow RoBERTa to achieve state‑of‑the‑art results on the GLUE benchmark, outperforming both BERT‑LARGE and XLNet‑LARGE while using the same model architecture and MLM objective (Table 5). In short, RoBERTa is a BERT‑style Transformer that is “robustly optimized” through better masking, removal of NSP, larger batches, richer tokenization, more data, and longer training. (RoBERTa: A Robustly Optimized BERT Pretraining Approach)",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q30",
+    "query": "What is autoregressive generation?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5909090909090909,
+      "answer_relevancy": 0.9999999999997717,
+      "context_precision": 0.19999999998,
+      "answer_similarity": 0.5483057444656709,
+      "total_score": 0.5848037088386334
+    },
+    "api_response": {
+      "answer": "Autoregressive generation is a modeling approach in which a complex object (such as an image, video, or text) is produced one discrete element at a time, with each element being predicted conditioned on all elements that have already been generated. In practice this is implemented with decoder‑only models that factorize the joint probability of a sequence \\(x_1,\\dots,x_T\\) as  \n\n\\[\np(x_1,\\dots,x_T)=\\prod_{t=1}^{T} p(x_t \\mid x_{<t}),\n\\]\n\nso the model repeatedly samples the next token (or pixel patch, video frame, etc.) given the previously sampled tokens.  \n\nThe context describes several concrete realizations:\n\n* Early autoregressive image models such as PixelRNN trained images pixel‑by‑pixel, and later transformer‑based versions that treat images as token sequences after compression with a VQGAN (a down‑sampling factor \\(f=16\\) yields a sequence length of 256 for a \\(256\\times256\\) image) (**Semi‑Parametric Neural Image Synthesis**).  \n* All of the models used in the scaling‑law studies are “decoder‑only GPT‑like transformer models” that generate tokens autoregressively (**Scaling Laws for Autoregressive Generative Modeling**).  \n* Autoregressive Transformers have been applied across many modalities—images, video, multimodal image↔text data, and even procedurally generated math problems—showing smooth performance improvements as model size and compute increase (**Scaling Laws for Autoregressive Generative Modeling**).\n\nThus, autoregressive generation refers to the sequential, conditional generation of data using models (often transformer decoders) that predict each new element based on the full history of previously generated elements.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q32",
+    "query": "What is the encoder-only architecture?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.9411764705882353,
+      "answer_relevancy": 0.8163311549714914,
+      "context_precision": 0.499999999975,
+      "answer_similarity": 0.7080357419764871,
+      "total_score": 0.7413858418778034
+    },
+    "api_response": {
+      "answer": "The encoder‑only architecture is a Transformer model that contains **only the encoder stack**—a series of self‑attention layers that process the input sequence and output contextualized token representations, without any accompanying decoder.  \n\n* In the original Transformer formulation, the encoder maps an input sequence \\((x_1,\\dots ,x_n)\\) to a sequence of continuous representations \\((z_1,\\dots ,z_n)\\) using stacked self‑attention and point‑wise feed‑forward layers (“Attention Is All You Need”).  \n* This encoder‑only design is used in models such as **BERT**, a 345 M‑parameter encoder‑only network that achieved strong language‑understanding performance on classification benchmarks like SuperGLUE (PaLM: Scaling Language Modeling with Pathways). BERT employs a “fully‑visible” attention mask—each token can attend to any other token in the input—and appends a special classification token to the sequence (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).  \n\nThus, the encoder‑only architecture consists of a stack of Transformer encoder layers (with fully‑visible self‑attention) that produce rich contextual embeddings for downstream tasks, exemplified by the BERT model.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q33",
+    "query": "What is few-shot learning?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.9333333333333333,
+      "answer_relevancy": 0.9389513926447207,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.6739461643471387,
+      "total_score": 0.8865577225762982
+    },
+    "api_response": {
+      "answer": "Few‑shot learning, as described in **“Language Models are Few‑Shot Learners,”** is a way of teaching a language model a new task at inference time by providing it with a small number of example input‑output pairs (the “shots”) as part of the prompt. The process works as follows:\n\n1. **In‑context demonstrations:** The model receives *K* examples (typically 10–100, limited by the model’s context window of 2048 tokens) that each consist of a *context* (e.g., an English sentence) and the desired *completion* (e.g., its French translation).  \n2. **Target query:** After the *K* demonstrations, a final example containing only the context is presented, and the model is expected to generate the appropriate completion for this last item.  \n3. **No weight updates:** The model’s parameters remain unchanged; learning occurs solely through conditioning on the provided demonstrations.  \n\n**Key properties**\n\n- **Reduced need for task‑specific data:** Because the model can adapt to a new task from only a handful of examples, large labeled datasets for fine‑tuning are unnecessary.  \n- **Risk of narrow generalization:** Few‑shot performance is generally weaker than that of state‑of‑the‑art fine‑tuned models, and a small amount of task‑specific data may still be required.  \n- **Scalability with model size and K:** Performance improves markedly as the model size grows and as more demonstrations are added to the prompt, even though no gradient‑based learning occurs.  \n\nThe term “few‑shot” thus refers specifically to this **in‑context, demonstration‑based adaptation** where the model learns to perform a new task from a few examples without any parameter updates. (Language Models are Few‑Shot Learners)",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q36",
+    "query": "How many attention heads does the transformer use?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5,
+      "answer_relevancy": 0.9148606510312337,
+      "context_precision": 0.3333333333,
+      "answer_similarity": 0.8021238984876627,
+      "total_score": 0.6375794707047241
+    },
+    "api_response": {
+      "answer": "The transformer employs **8 parallel attention heads** (i.e., h = 8) — as specified in *Attention Is All You Need* (Vaswani et al., 2017)【3】.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q34",
+    "query": "What is in-context learning?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9251236312238832,
+      "context_precision": 0.94999999997625,
+      "answer_similarity": 0.7063703149769622,
+      "total_score": 0.8953734865442738
+    },
+    "api_response": {
+      "answer": "In‑context learning is a way of specifying a task to a pretrained autoregressive language model solely through the text that is fed to it at inference time.  \nThe model receives a prompt that contains **(i)** a natural‑language description of the task and/or **(ii)** a few example input‑output pairs (demonstrations). After this contextual information, the model is asked to generate the continuation for new instances of the same task. Because the model has learned a broad set of linguistic and reasoning patterns during pre‑training, it can use the information present in the prompt to “rapidly adapt” and produce appropriate outputs without any parameter updates or separate fine‑tuning — the adaptation happens entirely within the context window ([Language Models are Few‑Shot Learners]).  \n\nThus, in‑context learning treats the prompt as a form of task specification: the model is conditioned on the instruction and demonstrations, and then it completes further instances by predicting the next token(s). This approach enables few‑shot, one‑shot, or zero‑shot performance, depending on how many demonstrations are provided.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q35",
+    "query": "What is the embedding dimension in transformers?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.8,
+      "answer_relevancy": 0.8986378831256929,
+      "context_precision": 0.99999999995,
+      "answer_similarity": 0.6192567428540697,
+      "total_score": 0.8294736564824406
+    },
+    "api_response": {
+      "answer": "The size of the token‐embedding vectors – often called the **embedding dimension** – is a model‑specific hyper‑parameter that is denoted **\\(d_{\\text{model}}\\)** in the original Transformer formulation. In *Attention Is All You Need* the authors state that the learned embeddings “convert the input tokens … to vectors of dimension \\(d_{\\text{model}}\\)” and that the same weight matrix is later scaled by \\(\\sqrt{d_{\\text{model}}}\\) (Attention Is All You Need).\n\nDifferent works instantiate this dimension with different values:\n\n| Paper / Model | Embedding Dimension |\n|---------------|---------------------|\n| Latent Diffusion Models (LDM‑1 … LDM‑32) – all stages | 512 (High‑Resolution Image Synthesis with Latent Diffusion Models) |\n| Text‑to‑Image / Layout‑to‑Image models (first stage) | 1280 (High‑Resolution Image Synthesis with Latent Diffusion Models) |\n| Vision Transformer ViT‑L/14 (and ViT‑L/14‑336px) | 768 (Learning Transferable Visual Models From Natural Language Supervision) |\n| Speech adapter (convolution → rotary Transformer) | latent dimension 3072 for the Transformer layer (The Llama 3 Herd of Models) – this is the internal hidden size rather than the token‑embedding size, but it follows the same principle that the Transformer operates on a fixed‑dimensional vector space. |\n\nThus, the embedding dimension in Transformers is the fixed vector size **\\(d_{\\text{model}}\\)**, which can be 512, 768, 1280, or any other value chosen for a particular architecture. The exact number depends on the model design and the task it is intended for.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q37",
+    "query": "What is the feed-forward dimension?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.75,
+      "answer_relevancy": 0.5495694922230961,
+      "context_precision": 0.249999999975,
+      "answer_similarity": 0.41005456134196083,
+      "total_score": 0.48990601338501427
+    },
+    "api_response": {
+      "answer": "The feed‑forward (inner‑layer) dimension varies across the architectures described in the excerpts:\n\n| Architecture | Feed‑forward dimension ( \\(d_{\\text{ff}}\\) ) | How it is defined |\n|--------------|--------------------------------------------|-------------------|\n| **Transformer (Attention Is All You Need)** – encoder and decoder | \\(d_{\\text{ff}} = 2048\\) | The model uses \\(d_{\\text{model}} = 512\\) and the feed‑forward size is set to four times the model dimension (4 × 512 = 2048). (“Attention Is All You Need”) |\n| **PaLM** | \\(d_{\\text{ff}} = 4 \\times d_{\\text{model}}\\) | The paper states that the feed‑forward size is always four times the model dimension, though a concrete numeric value is not given in the excerpt. (“PaLM: Scaling Language Modeling with Pathways”) |\n| **Llama 3 Speech Adapter** | \\(d_{\\text{ff}} = 4096\\) | The adapter’s Transformer layer contains a feed‑forward network with dimension 4096. (“The Llama 3 Herd of Models”) |\n| **Llama 3 Speech Encoder (Conformer)** | \\(d_{\\text{ff}} = 4096\\) (per feed‑forward sub‑network) | Each Conformer layer includes two “Macron‑net style” feed‑forward networks, each of dimension 4096. (“The Llama 3 Herd of Models”) |\n\nSo, the feed‑forward dimension is 2048 for the original Transformer, 4 × \\(d_{\\text{model}}\\) for PaLM, and 4096 for both the Llama 3 speech adapter and each feed‑forward block inside the Llama 3 speech encoder.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q38",
+    "query": "What is the vocabulary size of BERT?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.7167996400611544,
+      "context_precision": 0.0,
+      "answer_similarity": 0.7582613200426763,
+      "total_score": 0.6187652400259577
+    },
+    "api_response": {
+      "answer": "The original BERT implementation uses a character‑level Byte‑Pair Encoding vocabulary containing **30 K subword units**【1†L1-L3】.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q39",
+    "query": "What is the attention complexity?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.8571428571428571,
+      "answer_relevancy": 0.654375868413259,
+      "context_precision": 0.8055555555287036,
+      "answer_similarity": 0.5813726281939077,
+      "total_score": 0.7246117273196818
+    },
+    "api_response": {
+      "answer": "The self‑attention mechanism used in the Transformer has a **per‑layer computational complexity that grows quadratically with the sequence length**:\n\n- **Complexity:** \\(O(n^{2}\\,d)\\) where \\(n\\) is the length of the input sequence and \\(d\\) is the dimensionality of the token representations.  \n- **Parallelism:** Each attention operation can be performed in constant time with respect to sequential steps (operations = \\(O(1)\\) and the maximum sequential path length = \\(O(1)\\)), meaning the computation can be highly parallelized across positions.  \n\nThese figures are reported in *Attention Is All You Need* (see the complexity table for Self‑Attention)【1】.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q40",
+    "query": "What is beam search?",
+    "expected_paper_ids": [
+      "1706.03762"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.3,
+      "answer_relevancy": 0.8033255664688164,
+      "context_precision": 0.99999999995,
+      "answer_similarity": 0.5683948233190497,
+      "total_score": 0.6679300974344665
+    },
+    "api_response": {
+      "answer": "Beam search is a decoding algorithm used when generating sequences (e.g., translations, summaries, or free‑form completions). Instead of committing to a single token at each step as in greedy decoding, beam search keeps the *beam width* most promising partial hypotheses alive, expands each of them with all possible next tokens, scores the resulting candidates, and retains the top‑scoring set for the next step. A length‑penalty term (often denoted α) can be applied to balance the preference for longer versus shorter outputs. This approach typically yields higher quality results on tasks with long output sequences, as noted in several studies that switched from greedy decoding to beam search with a beam width of 4 and α = 0.6 (e.g., “Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”; “Language Models are Few‑Shot Learners”; “Attention Is All You Need”).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q43",
+    "query": "What is the benefit of larger models?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.5833333333333334,
+      "answer_relevancy": 0.5210792732625343,
+      "context_precision": 0.6999999999766667,
+      "answer_similarity": 0.5862372209534207,
+      "total_score": 0.5976624568814888
+    },
+    "api_response": {
+      "answer": "Larger models generally deliver higher predictive performance.  Empirical results in the T5 study show that “larger models tend to perform better” and that, compared with a baseline, a model such as T5‑Base “substantially outperforms” smaller configurations on every downstream task ([1]; [4]).  This superior performance is attributed not only to the increased number of parameters but also to additional factors that emerge at scale (e.g., richer representations and better utilization of pre‑training data).  Moreover, scaling analyses in the Flan collection indicate that as model size grows, performance on both held‑in and held‑out benchmarks continues to improve, suggesting that the biggest language models can still benefit from additional training tasks and data ([5]).  In short, larger models provide stronger overall accuracy and more robust transfer‑learning capabilities across a wide range of tasks.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q42",
+    "query": "What is WordPiece tokenization?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.7333333333333333,
+      "answer_relevancy": 0.9999999999997757,
+      "context_precision": 0.49999999995,
+      "answer_similarity": 0.6083594457051309,
+      "total_score": 0.71042319474706
+    },
+    "api_response": {
+      "answer": "WordPiece tokenization is a sub‑word segmentation technique that breaks raw text into a predefined set of word‑piece units (sub‑words) and then represents each piece with an embedding.  \n\n* In **BERT** the input text is first tokenized into “WordPiece tokens” drawn from a fixed vocabulary of 30 000 entries; each token receives a learned embedding that is summed with segment and position embeddings before being fed to the Transformer (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).  \n* In **T5** the authors likewise “encode text as WordPiece tokens” using the SentencePiece library, building a shared vocabulary of 32 000 word‑pieces that covers English as well as German, French, and Romanian (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).\n\nThus, WordPiece tokenization is a language‑independent subword tokenization method that creates a fixed‑size vocabulary of subword units, enabling the model to represent any word as a sequence of known pieces and to learn embeddings for those pieces.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q41",
+    "query": "What is tokenization?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.6666666666666666,
+      "answer_relevancy": 0.6835810317194996,
+      "context_precision": 0.5888888888692593,
+      "answer_similarity": 0.739190935745722,
+      "total_score": 0.6695818807502869
+    },
+    "api_response": {
+      "answer": "Tokenization is the preprocessing step that converts raw text (or code) into a discrete sequence of identifiers that a language model can consume. In the papers provided, tokenization is described as follows:\n\n* **Mapping text to token IDs** – The model receives a *sequence of token IDs* that correspond to a *tokenized span of text* from the training data. The token IDs are then used to create corrupted inputs and targets for unsupervised objectives (Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer).  \n\n* **Sub‑word vocabularies** – Qwen2.5 uses a **byte‑level byte‑pair encoding (BBPE)** tokenizer with a vocabulary of 151 643 regular tokens, while BERT employs **WordPiece** embeddings with a 30 000‑token vocabulary (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding). These sub‑word methods split words into smaller units so that the vocabulary can cover a large variety of words and symbols while keeping the token set manageable.\n\n* **Special control tokens** – Both Qwen2.5‑Coder and Qwen2.5 augment the base vocabulary with additional *special tokens* (e.g., `<|endoftext|>`, `<|fim_prefix|>`, `<|repo_name|>`, `[CLS]`, `[SEP]`). These tokens convey structural information such as the start/end of a sequence, delimiters for code‑fill‑in‑the‑middle operations, repository identifiers, or classification markers.\n\n* **Resulting token sequence** – After tokenization, the text (or code) is represented as a **ordered list of token IDs** that the transformer model processes. The token sequence can then be altered (masked, corrupted, padded) for training objectives, or fed directly to the model for downstream tasks.\n\nIn summary, tokenization is the conversion of raw textual (or code) data into a sequence of discrete token identifiers using sub‑word vocabularies (BBPE, WordPiece, etc.) and often enriched with special control tokens to encode structural cues for the model. (Qwen2.5‑Coder Technical Report; Qwen2.5 Technical Report; BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q44",
+    "query": "What is emergent ability?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.7504413404918941,
+      "context_precision": 0.6791666666496875,
+      "answer_similarity": 0.6262018943085883,
+      "total_score": 0.7639524753625425
+    },
+    "api_response": {
+      "answer": "**Emergent ability** refers to a capability that suddenly appears once a language model reaches a certain size, but is absent or very weak in smaller models. In the cited research, chain‑of‑thought (CoT) reasoning is repeatedly described as an emergent ability: it does not improve performance for modest‑scale models, yet yields large gains once the model has roughly 100 billion parameters or more (e.g., PaLM 540 B). This pattern—where abilities such as semantic understanding, symbol mapping, arithmetic reasoning, and faithful multi‑step reasoning only become reliable after scaling the model—captures the notion of an emergent ability (see *Chain‑of‑Thought Prompting Elicits Reasoning in Large Language Models*). In other words, an emergent ability is a function of model scale that “emerges” at a threshold size rather than being linearly predictable from smaller‑scale behavior.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q45",
+    "query": "What is the training objective of BERT?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8866846787039634,
+      "context_precision": 0.999999999975,
+      "answer_similarity": 0.7891705937060985,
+      "total_score": 0.9189638180962655
+    },
+    "api_response": {
+      "answer": "BERT is pretrained with two complementary objectives:\n\n1. **Masked Language Modeling (MLM)** – a random subset of tokens in the input is replaced with a special **[MASK]** token, and the model is trained (via a cross‑entropy loss) to predict the original vocabulary ID of each masked token using both its left and right context. This “cloze‑style” objective lets BERT learn deep bidirectional representations.  \n\n2. **Next Sentence Prediction (NSP)** – a binary classification task in which the model must predict whether two input segments (sentences) actually follow each other in the original text (positive examples) or are randomly paired from different documents (negative examples).  \n\nThese two objectives jointly pre‑train BERT’s Transformer encoder (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q48",
+    "query": "What is the maximum context window size of GPT-3?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.7422290795784986,
+      "context_precision": 0.9999999999,
+      "answer_similarity": 0.841825045755707,
+      "total_score": 0.8960135313085514
+    },
+    "api_response": {
+      "answer": "The models built on the GPT‑3 architecture described in the provided material are limited to a context length of **2 000 tokens** (i.e., a 2k‑token window)【1†L1-L4】.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q46",
+    "query": "What is the training objective of GPT?",
+    "expected_paper_ids": [
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.1111111111111111,
+      "answer_relevancy": 0.8119489364168406,
+      "context_precision": 0.99999999995,
+      "answer_similarity": 0.7019092405438563,
+      "total_score": 0.656242322005452
+    },
+    "api_response": {
+      "answer": "The core objective used to train the original GPT family (including GPT‑3) is a **next‑token (next‑word) prediction loss**.  \nDuring generative pre‑training the model is shown a long text sequence and is asked to assign a high probability to the actual next token in the sequence, while minimizing the probability of all other tokens. In other words, the model is trained to maximize the likelihood of the training data under a language‑model distribution. This objective is what the “raw language model” stage of ChatGPT training focuses on (How ChatGPT is Trained [1]), and it is the same objective described for GPT‑3 in the original paper (Brown et al., 2020 [2]).\n\nLater stages (supervised fine‑tuning, reward modeling, RLHF) build on top of this base objective, but the fundamental training goal of GPT itself is simply to predict the next word/token given its preceding context.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q47",
+    "query": "What is the difference between BERT and GPT?",
+    "expected_paper_ids": [
+      "1810.04805",
+      "2005.14165"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.92,
+      "answer_relevancy": 0.6339917486446494,
+      "context_precision": 0.999999999975,
+      "answer_similarity": 0.7629415235934656,
+      "total_score": 0.8292333180532787
+    },
+    "api_response": {
+      "answer": "**Architectural style** – BERT employs a *bidirectional* Transformer in which every token can attend to both its left‑hand and right‑hand context in all layers, whereas GPT uses a *left‑to‑right* (causal) Transformer that restricts each token to attend only to preceding tokens (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Pre‑training objectives** – BERT is trained with two tasks: (1) *masked language modeling* (MLM), where random tokens are replaced by a [MASK] token and the model must predict them, and (2) *next‑sentence prediction* (NSP), which teaches the model to judge whether two sentences follow each other. GPT, by contrast, is trained solely as a left‑to‑right language model that predicts the next token given all previous tokens (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Conditioning of representations** – Because of the MLM + bidirectional attention, BERT’s representations are jointly conditioned on both left and right context at every layer. GPT’s representations are conditioned only on left context (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Training data** – GPT is trained on the BooksCorpus (≈800 M words). BERT is trained on the same BooksCorpus *plus* English Wikipedia (≈2.5 B words), giving it a larger pre‑training corpus (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Special tokens** – GPT introduces the separator ([SEP]) and classifier ([CLS]) tokens only at fine‑tuning time. BERT learns these tokens (including sentence‑A/B embeddings) during pre‑training (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Training hyper‑parameters** – GPT was trained for 1 M steps with a batch size of 32 000 words; BERT used the same number of steps but a batch size of 128 000 words. Both use a base learning rate of 5e‑5 for fine‑tuning, but BERT selects a task‑specific fine‑tuning learning rate that performs best on the development set (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Model size for comparison** – BERTBASE was deliberately sized to match GPT’s parameter count, allowing a direct empirical comparison while keeping the architectural difference (bidirectional vs left‑to‑right) as the primary variable (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\n**Fine‑tuning vs feature‑based usage** – Both BERT and GPT are *fine‑tuning* approaches (the entire model is updated on downstream tasks), whereas methods such as ELMo are feature‑based (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”).\n\nIn summary, the key differences lie in BERT’s bidirectional self‑attention and dual pre‑training tasks (MLM + NSP), its larger training corpus and learned special tokens, and its larger batch size, all of which contrast with GPT’s left‑to‑right causal architecture, single language‑model objective, smaller corpus, and token handling.",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q50",
+    "query": "What is adapter tuning?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8940171885429841,
+      "context_precision": 0.99999999998,
+      "answer_similarity": 0.7333639660897576,
+      "total_score": 0.9068452886531855
+    },
+    "api_response": {
+      "answer": "Adapter tuning is a parameter‑efficient fine‑tuning technique that augments a pre‑trained Transformer with small, trainable “adapter” modules while leaving the bulk of the original model weights fixed.  \n\n* **Structure of the adapters** – An adapter consists of two fully‑connected (dense) layers with a non‑linearity (typically ReLU) between them, forming a bottleneck architecture (e.g., a low‑rank or low‑dimensional hidden size d or r). The output dimensionality of the adapter matches its input so it can be inserted without changing the surrounding network shape.  \n\n* **Where they are placed** – In the original design (called **Adapter H**) the adapters are inserted after both the self‑attention block and the feed‑forward (MLP) block, before the subsequent residual connection. A more efficient variant (**Adapter L**) places a single adapter only after the MLP block and after a LayerNorm; a similar design is referred to as **Adapter P**. Some methods (e.g., AdapterDrop) even drop a subset of adapters for extra efficiency.  \n\n* **Training behavior** – During fine‑tuning only the parameters of the adapter layers (and often the layer‑normalization parameters) are updated; the rest of the model’s parameters remain frozen. This dramatically reduces the number of trainable parameters (|Θ|) compared with full fine‑tuning, while still allowing the model to adapt to new tasks.  \n\n* **Motivation and usage** – Adapter tuning was introduced to keep most of the original model fixed while still achieving strong downstream performance, especially in low‑resource settings where a small inner dimensionality (e.g., d = 32) suffices, whereas higher‑resource tasks may need larger bottleneck sizes (e.g., d = 2048).  \n\nThus, adapter tuning refers to the insertion of lightweight, trainable bottleneck modules into a frozen large language model and updating only those modules (and optionally layer‑norm parameters) during task‑specific fine‑tuning.  \n\n*(References: “LORA: Low‑Rank Adaptation of Large Language Models” – description of Adapter H, Adapter L, Adapter P, AdapterDrop; “Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer” – description of adapter layers as dense‑ReLU‑dense blocks inserted after feed‑forward networks and only updating adapter and layer‑norm parameters.)*",
+      "sources_count": 5
+    },
+    "error": null
+  },
+  {
+    "query_id": "q49",
+    "query": "What is parameter efficient fine-tuning?",
+    "expected_paper_ids": [
+      "1810.04805"
+    ],
+    "ragas_metrics": {
+      "faithfulness": 0.95,
+      "answer_relevancy": 0.9690293166866337,
+      "context_precision": 0.8874999999778125,
+      "answer_similarity": 0.29642668901833114,
+      "total_score": 0.7757390014206943
+    },
+    "api_response": {
+      "answer": "**Parameter‑efficient fine‑tuning** (also called *parameter‑efficient tuning* or *continuous/soft prompt tuning*) is a family of adaptation methods that avoid updating the full set of weights of a large pre‑trained language model. Instead of learning a new copy of the entire parameter matrix \\( \\Phi_0 \\) for each downstream task, these methods modify only a small, learned subset of parameters—often a low‑rank additive component or a set of prompt embeddings—while keeping the vast majority of the original model frozen.\n\nKey characteristics drawn from the provided literature:\n\n| Aspect | Description |\n|--------|--------------|\n| **Scope of updates** | Only a tiny fraction of the total parameters are trainable. For example, LoRA encodes the task‑specific weight change \\( \\Delta\\Phi \\) with a low‑rank matrix \\( \\Theta \\) whose size can be as low as **0.01 %** of the original model’s parameters when applied to a 175 B‑parameter GPT‑3 (LoRA: Low‑Rank Adaptation of Large Language Models). |\n| **Goal** | Achieve performance comparable to full‑model fine‑tuning while drastically reducing computational cost, memory usage, and storage requirements. |\n| **Motivation** | Full fine‑tuning of models larger than ~100 B parameters demands many accelerators and is often prohibitively expensive (The Flan Collection). Moreover, storing a separate fine‑tuned copy for each task is impractical. |\n| **Typical techniques** | • **Prompt tuning / soft prompting** – learns continuous prompt vectors that are prepended to the input (treated as a form of parameter‑efficient tuning).  <br>• **Low‑rank adaptation (LoRA)** – adds low‑rank matrices to selected weight matrices, leaving the original weights unchanged (LoRA: Low‑Rank Adaptation of Large Language Models). <br>• **Other PEFT methods** – e.g., adapters, prefix tuning, which also modify only a small set of additional parameters. |\n| **Advantages over in‑context learning (ICL)** | Because few‑shot ICL requires long input sequences and repeated inference of exemplars, parameter‑efficient tuning can be **computationally cheaper and higher‑performing** while eliminating the need to embed exemplars in each query (The Flan Collection). |\n| **Practical benefits** | • **Reduced hardware demand** – can be trained on fewer GPUs/accelerators. <br>• **Fast task switching** – the base model is shared; only the small task‑specific modules need to be swapped (LoRA). <br>• **Storage efficiency** – many downstream adapters can be stored instead of many full model copies. |\n\nIn summary, parameter‑efficient fine‑tuning refers to methods that **learn a compact set of additional parameters (often via low‑rank or prompt‑based representations) while freezing the bulk of a large pre‑trained model**, thereby delivering near‑full‑model performance with far lower computational, memory, and storage costs. (References: *The Flan Collection: Designing Data and Methods for Effective Instruction Tuning*; *LoRA: Low‑Rank Adaptation of Large Language Models*).",
+      "sources_count": 5
+    },
+    "error": null
+  }
+]

@@ -1,0 +1,410 @@
+{
+  "metadata": {
+    "version": "3.0",
+    "purpose": "RAG Evaluation",
+    "description": "Test queries for evaluating RAG performance",
+    "total_queries": 50
+  },
+  "queries": [
+    {
+      "id": "q1",
+      "query": "What is the transformer architecture?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "The transformer is a neural network architecture based entirely on attention mechanisms."
+      }
+    },
+    {
+      "id": "q2",
+      "query": "How does self-attention work?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Self-attention computes the relationship between different positions in a sequence."
+      }
+    },
+    {
+      "id": "q3",
+      "query": "What is BERT?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "BERT stands for Bidirectional Encoder Representations from Transformers."
+      }
+    },
+    {
+      "id": "q4",
+      "query": "What is GPT?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "GPT stands for Generative Pre-trained Transformer."
+      }
+    },
+    {
+      "id": "q5",
+      "query": "What is the attention mechanism?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Attention allows the model to focus on relevant parts of the input."
+      }
+    },
+    {
+      "id": "q6",
+      "query": "What is layer normalization?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Layer normalization normalizes inputs across features to stabilize training."
+      }
+    },
+    {
+      "id": "q7",
+      "query": "What is masked language modeling?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Masked language modeling trains by predicting masked tokens from context."
+      }
+    },
+    {
+      "id": "q8",
+      "query": "What is encoder decoder architecture?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Encoder-decoder has an encoder for input and decoder for output generation."
+      }
+    },
+    {
+      "id": "q9",
+      "query": "What is positional encoding?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Positional encoding adds position information to input embeddings."
+      }
+    },
+    {
+      "id": "q10",
+      "query": "What is the scaled dot-product attention?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Scaled dot-product attention uses Q, K, V matrices with softmax."
+      }
+    },
+    {
+      "id": "q11",
+      "query": "How does multi-head attention work?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Multi-head attention performs several attention operations in parallel."
+      }
+    },
+    {
+      "id": "q12",
+      "query": "What is the role of feed-forward networks?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Feed-forward networks process each position separately with two linear layers."
+      }
+    },
+    {
+      "id": "q13",
+      "query": "What is bidirectional processing?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Bidirectional processing considers both left and right context."
+      }
+    },
+    {
+      "id": "q14",
+      "query": "What is next sentence prediction?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Next sentence prediction predicts if two sentences are consecutive."
+      }
+    },
+    {
+      "id": "q15",
+      "query": "What is dropout?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Dropout randomly sets activations to zero during training to prevent overfitting."
+      }
+    },
+    {
+      "id": "q16",
+      "query": "What is label smoothing?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Label smoothing uses soft targets instead of hard one-hot labels."
+      }
+    },
+    {
+      "id": "q17",
+      "query": "What is learning rate warmup?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Warmup gradually increases learning rate from zero to target."
+      }
+    },
+    {
+      "id": "q18",
+      "query": "Why are transformers parallelizable?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Transformers process all positions simultaneously unlike sequential models."
+      }
+    },
+    {
+      "id": "q19",
+      "query": "What is the difference between encoder and decoder?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Encoder creates representations from input, decoder generates output."
+      }
+    },
+    {
+      "id": "q20",
+      "query": "How many layers does the original transformer have?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "The original transformer has 6 layers in encoder and decoder."
+      }
+    },
+    {
+      "id": "q21",
+      "query": "What is the purpose of residual connections?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Residual connections help with gradient flow in deep networks."
+      }
+    },
+    {
+      "id": "q22",
+      "query": "What is the attention formula?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Attention is computed as softmax(QK^T/sqrt(d_k))V."
+      }
+    },
+    {
+      "id": "q23",
+      "query": "What is pre-training?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Pre-training trains on large unlabeled data before task-specific fine-tuning."
+      }
+    },
+    {
+      "id": "q24",
+      "query": "What is fine-tuning?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Fine-tuning adapts a pre-trained model to a specific task."
+      }
+    },
+    {
+      "id": "q25",
+      "query": "What is transfer learning?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Transfer learning applies knowledge from one task to another."
+      }
+    },
+    {
+      "id": "q26",
+      "query": "What is the [CLS] token in BERT?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "[CLS] is a special token used for classification output."
+      }
+    },
+    {
+      "id": "q27",
+      "query": "What is the [SEP] token in BERT?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "[SEP] separates sentences in BERT input."
+      }
+    },
+    {
+      "id": "q28",
+      "query": "What is masked LM in BERT?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "BERT randomly masks 15% of tokens and predicts them."
+      }
+    },
+    {
+      "id": "q29",
+      "query": "What is RoBERTa?",
+      "expected": {
+        "paper_ids": ["1907.11692"],
+        "answer": "RoBERTa is an optimized version of BERT trained with better methodology."
+      }
+    },
+    {
+      "id": "q30",
+      "query": "What is autoregressive generation?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "Autoregressive generation predicts next token based on previous tokens."
+      }
+    },
+    {
+      "id": "q31",
+      "query": "What is the decoder-only architecture?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "Decoder-only uses causal attention for text generation."
+      }
+    },
+    {
+      "id": "q32",
+      "query": "What is the encoder-only architecture?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Encoder-only uses bidirectional attention for understanding tasks."
+      }
+    },
+    {
+      "id": "q33",
+      "query": "What is few-shot learning?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "Few-shot learning adapts to tasks with minimal examples."
+      }
+    },
+    {
+      "id": "q34",
+      "query": "What is in-context learning?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "In-context learning uses examples in the prompt without parameter updates."
+      }
+    },
+    {
+      "id": "q35",
+      "query": "What is the embedding dimension in transformers?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "The original transformer uses 512 dimensional embeddings."
+      }
+    },
+    {
+      "id": "q36",
+      "query": "How many attention heads does the transformer use?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "The original transformer uses 8 attention heads."
+      }
+    },
+    {
+      "id": "q37",
+      "query": "What is the feed-forward dimension?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Feed-forward networks use 2048 hidden units."
+      }
+    },
+    {
+      "id": "q38",
+      "query": "What is the vocabulary size of BERT?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "BERT BASE uses 30522 vocabulary tokens."
+      }
+    },
+    {
+      "id": "q39",
+      "query": "What is the attention complexity?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Standard attention has quadratic complexity in sequence length."
+      }
+    },
+    {
+      "id": "q40",
+      "query": "What is beam search?",
+      "expected": {
+        "paper_ids": ["1706.03762"],
+        "answer": "Beam search keeps multiple hypotheses during generation."
+      }
+    },
+    {
+      "id": "q41",
+      "query": "What is tokenization?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Tokenization splits text into subword tokens."
+      }
+    },
+    {
+      "id": "q42",
+      "query": "What is WordPiece tokenization?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "WordPiece breaks words into subword units based on frequency."
+      }
+    },
+    {
+      "id": "q43",
+      "query": "What is the benefit of larger models?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "Larger models can learn more complex patterns and achieve better performance."
+      }
+    },
+    {
+      "id": "q44",
+      "query": "What is emergent ability?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "Emergent abilities appear in large models without explicit training."
+      }
+    },
+    {
+      "id": "q45",
+      "query": "What is the training objective of BERT?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "BERT uses masked language modeling and next sentence prediction."
+      }
+    },
+    {
+      "id": "q46",
+      "query": "What is the training objective of GPT?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "GPT uses causal language modeling to predict next token."
+      }
+    },
+    {
+      "id": "q47",
+      "query": "What is the difference between BERT and GPT?",
+      "expected": {
+        "paper_ids": ["1810.04805", "2005.14165"],
+        "answer": "BERT is bidirectional encoder, GPT is unidirectional decoder."
+      }
+    },
+    {
+      "id": "q48",
+      "query": "What is the maximum context window size of GPT-3?",
+      "expected": {
+        "paper_ids": ["2005.14165"],
+        "answer": "GPT-3 has a maximum context window of 2048 tokens."
+      }
+    },
+    {
+      "id": "q49",
+      "query": "What is parameter efficient fine-tuning?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "PEFT updates only a small subset of parameters."
+      }
+    },
+    {
+      "id": "q50",
+      "query": "What is adapter tuning?",
+      "expected": {
+        "paper_ids": ["1810.04805"],
+        "answer": "Adapter tuning adds small layers that are trained while keeping base model fixed."
+      }
+    }
+  ]
+}

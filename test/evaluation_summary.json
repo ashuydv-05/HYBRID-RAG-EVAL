@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-03-03T13:06:19.314353",
+  "summary": {
+    "total_queries": 50
+  },
+  "ragas_metrics": {
+    "faithfulness": {
+      "mean": 0.7852,
+      "count": 50
+    },
+    "answer_relevancy": {
+      "mean": 0.7953,
+      "count": 50
+    },
+    "context_precision": {
+      "mean": 0.7244,
+      "count": 50
+    },
+    "answer_similarity": {
+      "mean": 0.6509,
+      "count": 50
+    },
+    "total_score": {
+      "mean": 0.739,
+      "count": 50
+    }
+  },
+  "errors": {
+    "total": 0,
+    "timeout": 0,
+    "details": []
+  }
+}

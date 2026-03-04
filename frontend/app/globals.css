@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-950: #030712;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: #374151;
+  background: #ffffff;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Prose (markdown) overrides */
+.prose a {
+  color: #10a37f;
+}
+
+.prose a:hover {
+  color: #0d8a6b;
+}
+
+.prose code {
+  color: #ef4444;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+/* Code blocks managed by react-syntax-highlighter — reset prose defaults */
+.prose pre {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+.prose pre code {
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+
+.prose blockquote {
+  border-left-color: #e5e7eb;
+  color: #6b7280;
+  font-style: normal;
+}
+
+.prose blockquote p::before,
+.prose blockquote p::after {
+  content: none;
+}
+
+/* Typewriter streaming cursor */
+@keyframes typewriter {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.streaming-cursor::after {
+  content: '▋';
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: #10a37f;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: typewriter 1s step-end infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Message slide in animation */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-enter {
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+
+/* Collapsible section animation */
+@keyframes expand {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button hover effects */
+button:hover {
+  transition: all 0.2s ease;
+}
+
+/* Kbd styles */
+kbd {
+  font-family: inherit;
+}
+
+/* Selection color */
+::selection {
+  background: #d1fae5;
+  color: #065f46;
+}
