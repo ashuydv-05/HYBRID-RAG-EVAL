@@ -23,7 +23,7 @@ flowchart TB
 
     subgraph Backend["Backend Layer"]
         API[FastAPI]
-        Agent[ReAct Agent]
+        Agent[LangGraph Agent<br/>ReAct-style]
     end
 
     subgraph Storage["Storage Layer"]
@@ -77,7 +77,7 @@ flowchart TB
   - If insufficient: fallback to web search
 
 **3. Generation Layer**
-- **ReAct Agent**: LangGraph-based workflow with structured reasoning
+- **Agent**: LangGraph workflow with ReAct-style prompting
 - **NVIDIA NIM**: LLM inference (gpt-oss-120b)
 - **Web Search Fallback**: Tavily for current events
 
@@ -195,7 +195,7 @@ research-assistant-chatbot/
 ## Features
 
 - Hybrid Search: Dense (Qdrant) + BM25 (Elasticsearch) + RRF Fusion
-- ReAct Agent: LangGraph-based workflow with structured reasoning
+- Agent: LangGraph workflow with ReAct-style prompting
 - Document Validation: LLM-based relevance grading
 - Streaming Response: Real-time answer generation
 - Session Management: Persistent chat history
