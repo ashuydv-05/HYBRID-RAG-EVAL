@@ -89,31 +89,37 @@ class VectorSearch:
         ]
 
     def bm25_search(self, query: str, top_k: int = 50) -> list[SearchResult]:
-        index = settings.elasticsearch.index
-        fields = ["title^3.0", "content^2.0"]
-        es_query = {
-            "multi_match": {
-                "query": query,
-                "fields": fields,
-                "type": "best_fields",
-                "fuzziness": "AUTO",
+        if self.es is None:
+            return []
+        try:
+            index = settings.elasticsearch.index
+            fields = ["title^3.0", "content^2.0"]
+            es_query = {
+                "multi_match": {
+                    "query": query,
+                    "fields": fields,
+                    "type": "best_fields",
+                    "fuzziness": "AUTO",
+                }
             }
-        }
-        response = self.es.search(index=index, query=es_query, size=top_k)
-        results = []
-        for hit in response["hits"]["hits"]:
-            src = hit["_source"]
-            results.append(
-                SearchResult(
-                    id=int(hit["_id"]),
-                    content=src.get("content", ""),
-                    title=src.get("title", "Unknown"),
-                    score=float(hit["_score"]),
-                    source="bm25",
-                    metadata=src,
+            response = self.es.search(index=index, query=es_query, size=top_k, request_timeout=1.0)
+            results = []
+            for hit in response["hits"]["hits"]:
+                src = hit["_source"]
+                results.append(
+                    SearchResult(
+                        id=int(hit["_id"]),
+                        content=src.get("content", ""),
+                        title=src.get("title", "Unknown"),
+                        score=float(hit["_score"]),
+                        source="bm25",
+                        metadata=src,
+                    )
                 )
-            )
-        return results
+            return results
+        except Exception as e:
+            logger.debug(f"BM25 search skipped: {e}")
+            return []
 
     def rrf_fuse(
         self, results_list: list[list[SearchResult]], top_k: int = 20
@@ -167,21 +173,18 @@ class VectorSearch:
         self, query: str, results: list[SearchResult], top_k: int | None = None
     ) -> list[SearchResult]:
         top_k = top_k or self.config.rerank_top_k
-        try:
-            reranker = self.get_cross_encoder()
-        except Exception as e:
-            logger.warning(f"CrossEncoder unavailable: {e}")
-            return results[:top_k]
         if not results:
             return []
-
-        pairs = [(query, f"{r.title}. {r.content}"[:1000]) for r in results]
-        ce_scores = reranker.predict(pairs)
-
-        scored = list(zip(results, ce_scores))
-        scored.sort(key=lambda x: float(x[1]), reverse=True)
-
-        return [r for r, _ in scored[:top_k]]
+        try:
+            reranker = self.get_cross_encoder()
+            pairs = [(query, f"{r.title}. {r.content}"[:1000]) for r in results[:10]]
+            ce_scores = reranker.predict(pairs)
+            scored = list(zip(results[:10], ce_scores))
+            scored.sort(key=lambda x: float(x[1]), reverse=True)
+            return [r for r, _ in scored[:top_k]]
+        except Exception as e:
+            logger.warning(f"CrossEncoder unavailable/skipped: {e}")
+            return results[:top_k]
 
 
 class WebSearch:

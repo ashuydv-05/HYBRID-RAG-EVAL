@@ -33,5 +33,9 @@ def get_qdrant_client() -> QdrantClient:
     )
 
 
-def get_es_client() -> Elasticsearch:
-    return Elasticsearch(settings.elasticsearch.url, request_timeout=60)
+def get_es_client() -> Elasticsearch | None:
+    es_url = os.getenv("ES_URL", settings.elasticsearch.url)
+    try:
+        return Elasticsearch(es_url, request_timeout=1.0, max_retries=0)
+    except Exception:
+        return None
