@@ -24,9 +24,11 @@ def get_llm_client() -> ChatOpenAI:
 
 
 def get_qdrant_client() -> QdrantClient:
+    url = os.getenv("QDRANT_URL", settings.qdrant.url)
+    api_key = os.getenv("QDRANT_API_KEY", settings.qdrant.api_key)
     return QdrantClient(
-        url=settings.qdrant.url,
-        api_key=settings.qdrant.api_key,
+        url=url,
+        api_key=api_key if api_key else None,
         check_compatibility=False,
     )
 
