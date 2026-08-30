@@ -56,10 +56,10 @@ async def chat(
     workflow: MultiAgentWorkflow = Depends(get_workflow),
     x_groq_api_key: str | None = Header(None, alias="x-groq-api-key"),
 ) -> ChatResponse:
-    if x_groq_api_key:
-        os.environ["GROQ_API_KEY"] = x_groq_api_key
-    elif request.groq_api_key:
-        os.environ["GROQ_API_KEY"] = request.groq_api_key
+    if x_groq_api_key and x_groq_api_key.strip():
+        os.environ["GROQ_API_KEY"] = x_groq_api_key.strip()
+    elif request.groq_api_key and request.groq_api_key.strip():
+        os.environ["GROQ_API_KEY"] = request.groq_api_key.strip()
 
     session_id = request.session_id or generate_session_id()
     logger.info(
@@ -74,11 +74,22 @@ async def chat(
         logger.info(
             f"[API] Workflow completed. Sources count: {len(result.source)}, Reasoning steps: {len(result.reasoning_step)}"
         )
-        logger.info(f"[API] Answer preview: {result.answer[:100]}...")
-        logger.info(f"[API] Sources: {result.source}")
+        answer = result.answer
+        if not answer or not answer.strip():
+            logger.warning("[API] Workflow returned empty answer, generating fallback response...")
+            try:
+                from src.config.clients import get_llm_client
+                llm = get_llm_client()
+                if llm:
+                    direct_resp = llm.invoke(f"You are an expert AI academic research assistant. Please answer this query thoroughly: {request.message}")
+                    answer = direct_resp.content
+            except Exception as ex:
+                logger.error(f"[API] Fallback generation error: {ex}")
+                answer = "I processed your request, but was unable to formulate a complete answer. Please try rephrasing."
+
         execution_time = (time.time() - start_time) * 1000
         return ChatResponse(
-            answer=result.answer,
+            answer=answer,
             session_id=session_id,
             reasoning_steps=build_reasoning_steps(result),
             sources=convert_sources(result.source),
