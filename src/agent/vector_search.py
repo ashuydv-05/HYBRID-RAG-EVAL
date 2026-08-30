@@ -6,7 +6,7 @@ import time
 
 
 def vector_search_node(state: AgentState) -> dict:
-    query = state.get("query", "")
+    query = state.get("search_query") or state.get("query", "")
     existing_timings = state.get("node_timings", {})
 
     start_time = time.time()

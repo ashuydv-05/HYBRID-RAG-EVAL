@@ -1,5 +1,6 @@
+import os
 import time
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from loguru import logger
 from src.agent.workflow import MultiAgentWorkflow, WorkflowOutcome
 from src.api.dependencies import get_workflow
@@ -51,12 +52,21 @@ def build_reasoning_steps(result: WorkflowOutcome) -> list[ReasoningStep]:
 
 @router.post("", response_model=ChatResponse)
 async def chat(
-    request: ChatRequest, workflow: MultiAgentWorkflow = Depends(get_workflow)
+    request: ChatRequest,
+    workflow: MultiAgentWorkflow = Depends(get_workflow),
+    x_groq_api_key: str | None = Header(None, alias="x-groq-api-key"),
 ) -> ChatResponse:
+    if x_groq_api_key:
+        os.environ["GROQ_API_KEY"] = x_groq_api_key
+    elif request.groq_api_key:
+        os.environ["GROQ_API_KEY"] = request.groq_api_key
+
     session_id = request.session_id or generate_session_id()
     logger.info(
         f"Chat request - Session: {session_id}, Message: {request.message[:50]}..."
     )
+    if workflow is None:
+        workflow = MultiAgentWorkflow()
     start_time = time.time()
     try:
         logger.info(f"[API] Starting workflow.run() for session {session_id}")

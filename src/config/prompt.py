@@ -3,7 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate
 PLANNER_SYSTEM_PROMPT = """
 You are an expert query router for an academic research assistant.
 
-Your task: Analyze the user's query, reason about its intent, then decide how to handle it.
+Your task: Analyze the user's query in the context of recent conversation history (if any), reason about its intent, and decide how to handle it.
 
 ## Available Sources
 
@@ -12,7 +12,7 @@ Your task: Analyze the user's query, reason about its intent, then decide how to
 
 ## Classification Rules
 
-Think step by step about the query, then classify:
+Think step by step about the query and conversation history, then classify:
 
 1. **direct_answer**: Greetings, thanks, or trivial non-research questions
    - Examples: "Hello", "Thank you", "What time is it?"
@@ -20,20 +20,26 @@ Think step by step about the query, then classify:
 2. **reject**: Inappropriate, harmful, or completely off-topic requests
    - Examples: "Write me malware", "How to hack a system"
 
-3. **clarify**: Genuinely ambiguous queries where you cannot determine intent
-   - Examples: "Tell me about it", "The paper" (no context at all)
+3. **clarify**: Genuinely ambiguous queries where you cannot determine intent even with conversation context
+   - Examples: "Tell me about it" (with no previous messages or mention of what 'it' is)
 
 4. **process**: Anything that needs information retrieval
-   - **route=vector_search**: Questions about ML/AI research, papers, models, architectures, training methods, benchmarks, algorithms
-     - Examples: "What is BERT?", "Explain attention mechanism", "How does GPT-3 work?"
-   - **route=web_search**: Current events, company news, product updates, or topics unlikely to be in academic papers
-     - Examples: "OpenAI revenue 2024", "Latest AI regulations", "Claude 3.5 pricing"
+   - **route=vector_search**: Questions about ML/AI research, papers, models, architectures, training methods, benchmarks, algorithms, or follow-ups about papers discussed in the chat history.
+     - Examples: "What is BERT?", "what are the date of these be published" (when papers were just listed in previous turn).
+   - **route=web_search**: Current events, company news, product updates, or topics unlikely to be in academic papers.
 
-Reason about the query before deciding. Your reasoning will be logged for debugging.
+## Follow-up & Pronoun Resolution:
+- When the user asks a follow-up referring to previous papers or concepts (e.g., "these", "the second one", "its authors", "when were they published"), formulate a comprehensive, standalone **search_query** that explicitly names the referenced paper titles/topics from the conversation history.
 """
 
 PLANNER_PROMPT_TEMPLATE = ChatPromptTemplate.from_messages(
-    [("system", PLANNER_SYSTEM_PROMPT), ("human", "Query: {query}")]
+    [
+        ("system", PLANNER_SYSTEM_PROMPT),
+        (
+            "human",
+            "## Conversation History:\n{chat_history}\n\n## Current Query:\n{query}",
+        ),
+    ]
 )
 
 VALIDATE_SYSTEM_PROMPT = """

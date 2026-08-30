@@ -21,6 +21,9 @@ class ChatRequest(BaseModel):
     session_id: str | None = Field(
         None, description="Session ID for conversation continuity"
     )
+    groq_api_key: str | None = Field(
+        None, description="User-provided Groq API Key"
+    )
 
 
 class ChatResponse(BaseModel):

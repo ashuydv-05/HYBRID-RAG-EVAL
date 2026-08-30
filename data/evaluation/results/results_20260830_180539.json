@@ -1,0 +1,374 @@
+{
+  "timestamp": "2026-08-30T18:05:39.770210+00:00",
+  "dataset_path": "data/evaluation/evaluation_dataset.json",
+  "judge_model": "openai/gpt-oss-120b",
+  "top_k": 5,
+  "configurations": {
+    "vector+model_1": {
+      "retrieval": "vector",
+      "llm": "model_1",
+      "total_samples": 3,
+      "avg_correctness": 0.0,
+      "avg_faithfulness": 0.0,
+      "avg_relevance": 0.0,
+      "avg_overall": 0.0,
+      "avg_precision_at_k": 0.0,
+      "avg_recall_at_k": 0.0,
+      "avg_mrr": 0.0,
+      "avg_latency_ms": 7193.18
+    },
+    "vector+model_2": {
+      "retrieval": "vector",
+      "llm": "model_2",
+      "total_samples": 3,
+      "avg_correctness": 0.0,
+      "avg_faithfulness": 0.0,
+      "avg_relevance": 0.0,
+      "avg_overall": 0.0,
+      "avg_precision_at_k": 0.0,
+      "avg_recall_at_k": 0.0,
+      "avg_mrr": 0.0,
+      "avg_latency_ms": 5.34
+    },
+    "hybrid+model_1": {
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "total_samples": 3,
+      "avg_correctness": 16.67,
+      "avg_faithfulness": 83.33,
+      "avg_relevance": 16.67,
+      "avg_overall": 36.67,
+      "avg_precision_at_k": 0.0,
+      "avg_recall_at_k": 0.0,
+      "avg_mrr": 0.0,
+      "avg_latency_ms": 2610.99
+    },
+    "hybrid+model_2": {
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "total_samples": 3,
+      "avg_correctness": 0.0,
+      "avg_faithfulness": 0.0,
+      "avg_relevance": 0.0,
+      "avg_overall": 0.0,
+      "avg_precision_at_k": 0.0,
+      "avg_recall_at_k": 0.0,
+      "avg_mrr": 0.0,
+      "avg_latency_ms": 61.87
+    }
+  },
+  "best_configuration": "hybrid+model_1",
+  "best_reason": "Hybrid Retrieval + model_1 achieved the highest composite score (36.67%) with Correctness=16.67%, Faithfulness=83.33%, Relevance=16.67%, and average latency of 2611.0ms.",
+  "comparison_matrix": {
+    "vector": {
+      "model_1": 0.0,
+      "model_2": 0.0
+    },
+    "hybrid": {
+      "model_1": 36.67,
+      "model_2": 0.0
+    }
+  },
+  "detailed_results": [
+    {
+      "question_id": 1,
+      "retrieval": "vector",
+      "llm": "model_1",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "Error: [Errno 61] Connection refused",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The generated answer is an error message and does not provide any information about the transformer architecture, failing all criteria."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 21564.53,
+      "error": "[Errno 61] Connection refused"
+    },
+    {
+      "question_id": 2,
+      "retrieval": "vector",
+      "llm": "model_1",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "Error: [Errno 61] Connection refused",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The answer is an error message unrelated to self-attention, providing no correct information, not grounded in any context, and does not address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 8.5,
+      "error": "[Errno 61] Connection refused"
+    },
+    {
+      "question_id": 3,
+      "retrieval": "vector",
+      "llm": "model_1",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "Error: [Errno 61] Connection refused",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The answer is an error message and provides no information about BERT, failing to answer the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 6.5,
+      "error": "[Errno 61] Connection refused"
+    },
+    {
+      "question_id": 1,
+      "retrieval": "vector",
+      "llm": "model_2",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "Error: [Errno 61] Connection refused",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The generated answer is an error message and does not provide any information about the transformer architecture, failing all criteria."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 5.67,
+      "error": "[Errno 61] Connection refused"
+    },
+    {
+      "question_id": 2,
+      "retrieval": "vector",
+      "llm": "model_2",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "Error: [Errno 61] Connection refused",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The answer is an unrelated error message, providing no correct information, not grounded in any context, and does not address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 3.28,
+      "error": "[Errno 61] Connection refused"
+    },
+    {
+      "question_id": 3,
+      "retrieval": "vector",
+      "llm": "model_2",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "Error: [Errno 61] Connection refused",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The generated answer is an error message and does not provide any information about BERT, failing to answer the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 7.08,
+      "error": "[Errno 61] Connection refused"
+    },
+    {
+      "question_id": 1,
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "I’m unable to provide a description of the transformer architecture because the supplied context does not contain any information about it. If you can provide the relevant text or excerpts that discuss the transformer architecture, I’ll be able to give a thorough answer based on that material.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer does not provide the correct description of the transformer architecture, but it accurately reflects the lack of retrieved context and does not introduce unsupported information; however, it fails to address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 550.09,
+      "error": null
+    },
+    {
+      "question_id": 2,
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "I’m unable to provide an answer because the supplied context does not contain any information about self‑attention mechanisms in neural networks. Additional details or excerpts describing self‑attention would be needed to respond accurately.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 50.0,
+        "faithfulness": 50.0,
+        "relevance": 50.0,
+        "overall": 50.0,
+        "reason": "Judge evaluation encountered error: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organ"
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 4568.4,
+      "error": null
+    },
+    {
+      "question_id": 3,
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "I’m unable to provide an answer because the necessary information about BERT is not present in the supplied context.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer does not provide the correct definition or acronym for BERT, so correctness and relevance are zero, but it accurately reflects the absence of retrieved context, making it fully faithful."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 2714.48,
+      "error": null
+    },
+    {
+      "question_id": 1,
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "Error: Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The answer is an error message unrelated to the question, providing no correct information, not grounded in any context, and not addressing the query."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 64.87,
+      "error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+    },
+    {
+      "question_id": 2,
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "Error: Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The response is an error message unrelated to the question, providing no correct or relevant information."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 52.44,
+      "error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+    },
+    {
+      "question_id": 3,
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "Error: Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 0.0,
+        "relevance": 0.0,
+        "overall": 0.0,
+        "reason": "The generated answer is an error message and does not provide any information about BERT, failing to answer the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 68.3,
+      "error": "Error code: 404 - {'error': {'message': 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'code': 'model_not_found'}}"
+    }
+  ]
+}

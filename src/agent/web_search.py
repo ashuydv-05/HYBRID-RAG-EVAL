@@ -5,7 +5,7 @@ from src.retrieval.hybrid_search import WebSearch
 
 
 def web_search_node(state: AgentState) -> dict:
-    query = state.get("query", "")
+    query = state.get("search_query") or state.get("query", "")
     try:
         searcher = WebSearch()
         if not searcher.is_available():

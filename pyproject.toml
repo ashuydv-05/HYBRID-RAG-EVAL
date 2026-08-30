@@ -47,3 +47,7 @@ build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["test"]

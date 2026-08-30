@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.api.route.chat import router as chat_router
 from src.api.route.health import router as health_router
+from src.api.route.evaluation import router as evaluation_router
 from src.agent.workflow import MultiAgentWorkflow
 
 
@@ -38,6 +39,7 @@ app.add_middleware(
 )
 app.include_router(chat_router, prefix="/api")
 app.include_router(health_router, prefix="/api")
+app.include_router(evaluation_router, prefix="/api")
 
 
 @app.get("/")

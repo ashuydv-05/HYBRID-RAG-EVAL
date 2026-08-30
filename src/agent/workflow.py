@@ -12,7 +12,8 @@ from src.agent.gen import gen_node
 import time
 import uuid
 from langfuse.langchain import CallbackHandler
-from datetime import datetime
+from datetime import datetime, timezone
+from langgraph.checkpoint.memory import MemorySaver
 
 
 @dataclass
@@ -21,6 +22,8 @@ class WorkflowOutcome:
     source: list[dict] = field(default_factory=list)
     reasoning_step: list[str] = field(default_factory=list)
     node_timings: dict = field(default_factory=dict)
+    trace_id: str | None = None
+    langfuse_url: str | None = None
 
 
 def route_question(state: AgentState) -> str:
@@ -51,7 +54,8 @@ def create_workflow() -> MultiAgentWorkflow:
 
 
 class MultiAgentWorkflow:
-    def __init__(self):
+    def __init__(self, checkpointer: MemorySaver | None = None):
+        self.checkpointer = checkpointer if checkpointer is not None else MemorySaver()
         self.app = self.create_and_compile_graph()
 
     def create_and_compile_graph(self):
@@ -79,13 +83,14 @@ class MultiAgentWorkflow:
         )
         workflow.add_edge("web_search", "generate")
         workflow.add_edge("generate", END)
-        return workflow.compile()
+        return workflow.compile(checkpointer=self.checkpointer)
 
     def run(self, query: str, session_id: str | None = None) -> WorkflowOutcome:
         thread_id = session_id or str(uuid.uuid4())
 
-        initial_state: AgentState = {
+        input_state: AgentState = {
             "query": query,
+            "search_query": None,
             "decision": "process",
             "route": None,
             "document": [],
@@ -97,7 +102,7 @@ class MultiAgentWorkflow:
                 {
                     "role": "user",
                     "content": query,
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 }
             ],
             "node_timings": {},
@@ -105,7 +110,7 @@ class MultiAgentWorkflow:
 
         try:
             result = self.app.invoke(
-                initial_state,
+                input_state,
                 config={
                     "configurable": {"thread_id": thread_id},
                     "recursion_limit": 10,

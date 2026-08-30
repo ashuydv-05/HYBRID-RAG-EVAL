@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Message, Source } from '@/types/chat';
-import { sendMessage, getSessionHistory, clearSession } from '@/lib/api';
+import { sendMessage } from '@/lib/api';
 
 const STREAMING_DELAY_MS = 3;
 
@@ -22,7 +22,6 @@ interface UseChatReturn {
   sendMessage: () => Promise<void>;
   stopStreaming: () => void;
   clearMessages: () => void;
-  loadSessionHistory: (sid: string) => Promise<void>;
 }
 
 export function useChat(options: UseChatOptions = {}): UseChatReturn {
@@ -30,22 +29,27 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+
   const [sessionId, setSessionId] = useState<string>(
     options.sessionId || uuidv4()
   );
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const streamingIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   const cleanupStreaming = useCallback(() => {
     if (streamingIntervalRef.current) {
       clearTimeout(streamingIntervalRef.current);
       streamingIntervalRef.current = null;
     }
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
+
     setIsStreaming(false);
     setIsLoading(false);
   }, []);
@@ -54,49 +58,72 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setMessages((prev) => [...prev, message]);
   }, []);
 
-  const updateMessage = useCallback((id: string, updates: Partial<Message>) => {
-    setMessages((prev) =>
-      prev.map((msg) => (msg.id === id ? { ...msg, ...updates } : msg))
-    );
-  }, []);
+  const updateMessage = useCallback(
+    (id: string, updates: Partial<Message>) => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === id ? { ...msg, ...updates } : msg
+        )
+      );
+    },
+    []
+  );
 
-  const simulateStreaming = (
-    fullContent: string,
-    assistantMessageId: string,
-    sources: Source[]
-  ) => {
-    setIsStreaming(true);
-    let currentIndex = 0;
-    const chars = fullContent.split('');
+  const simulateStreaming = useCallback(
+    (
+      fullContent: string,
+      assistantMessageId: string,
+      sources: Source[]
+    ) => {
+      setIsStreaming(true);
 
-    const streamNext = () => {
-      if (currentIndex >= chars.length) {
+      let currentIndex = 0;
+      const chars = fullContent.split('');
+
+      const streamNext = () => {
+        if (currentIndex >= chars.length) {
+          updateMessage(assistantMessageId, {
+            isStreaming: false,
+            content: fullContent,
+            sources,
+          });
+
+          setIsStreaming(false);
+          streamingIntervalRef.current = null;
+          return;
+        }
+
+        const currentContent = chars
+          .slice(0, currentIndex + 1)
+          .join('');
+
         updateMessage(assistantMessageId, {
-          isStreaming: false,
-          content: fullContent,
+          content: currentContent,
           sources,
         });
-        setIsStreaming(false);
-        streamingIntervalRef.current = null;
-        return;
-      }
 
-      const currentContent = chars.slice(0, currentIndex + 1).join('');
-      updateMessage(assistantMessageId, {
-        content: currentContent,
-        sources,
-      });
-      currentIndex++;
+        currentIndex++;
 
-      streamingIntervalRef.current = setTimeout(streamNext, STREAMING_DELAY_MS);
-    };
+        streamingIntervalRef.current = setTimeout(
+          streamNext,
+          STREAMING_DELAY_MS
+        );
+      };
 
-    streamingIntervalRef.current = setTimeout(streamNext, STREAMING_DELAY_MS);
-  };
+      streamingIntervalRef.current = setTimeout(
+        streamNext,
+        STREAMING_DELAY_MS
+      );
+    },
+    [updateMessage]
+  );
 
   const handleSendMessage = useCallback(async () => {
     const trimmedInput = input.trim();
-    if (!trimmedInput || isLoading) return;
+
+    if (!trimmedInput || isLoading) {
+      return;
+    }
 
     const userMessage: Message = {
       id: uuidv4(),
@@ -110,6 +137,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setIsLoading(true);
 
     const assistantMessageId = uuidv4();
+
     const assistantMessage: Message = {
       id: assistantMessageId,
       role: 'assistant',
@@ -117,6 +145,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       isStreaming: true,
       timestamp: new Date(),
     };
+
     addMessage(assistantMessage);
 
     abortControllerRef.current = new AbortController();
@@ -127,19 +156,28 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         session_id: sessionId,
       });
 
-      simulateStreaming(response.answer, assistantMessageId, response.sources);
+      simulateStreaming(
+        response.answer,
+        assistantMessageId,
+        response.sources || []
+      );
 
-      if (response.session_id && response.session_id !== sessionId) {
+      if (
+        response.session_id &&
+        response.session_id !== sessionId
+      ) {
         setSessionId(response.session_id);
       }
     } catch (error) {
-      let errorMessage = 'An unexpected error occurred. Please try again.';
+      let errorMessage =
+        'An unexpected error occurred. Please try again.';
 
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           errorMessage = 'Request was cancelled.';
         } else if (error.message.includes('Failed to fetch')) {
-          errorMessage = 'Cannot connect to server. Please check your connection.';
+          errorMessage =
+            'Cannot connect to server. Please check that the FastAPI backend is running on port 8000.';
         } else {
           errorMessage = error.message;
         }
@@ -151,63 +189,58 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         isError: true,
       });
 
-      options.onError?.(error instanceof Error ? error : new Error(errorMessage));
+      options.onError?.(
+        error instanceof Error
+          ? error
+          : new Error(errorMessage)
+      );
+
       setIsStreaming(false);
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [input, isLoading, sessionId, addMessage, updateMessage, options]);
+  }, [
+    input,
+    isLoading,
+    sessionId,
+    addMessage,
+    updateMessage,
+    simulateStreaming,
+    options,
+  ]);
 
   const stopStreaming = useCallback(() => {
     cleanupStreaming();
 
     setMessages((prev) => {
-      const lastMsg = prev[prev.length - 1];
-      if (lastMsg && lastMsg.role === 'assistant') {
-        return prev.map((msg) =>
-          msg.id === lastMsg.id ? { ...msg, isStreaming: false } : msg
+      const lastMessage = prev[prev.length - 1];
+
+      if (
+        lastMessage &&
+        lastMessage.role === 'assistant'
+      ) {
+        return prev.map((message) =>
+          message.id === lastMessage.id
+            ? {
+                ...message,
+                isStreaming: false,
+              }
+            : message
         );
       }
+
       return prev;
     });
   }, [cleanupStreaming]);
 
-  const clearMessages = useCallback(async () => {
+  const clearMessages = useCallback(() => {
     cleanupStreaming();
-
-    try {
-      await clearSession(sessionId);
-    } catch {
-    }
 
     setMessages([]);
     setSessionId(uuidv4());
     setInput('');
-  }, [sessionId, cleanupStreaming]);
-
-  const loadSessionHistory = useCallback(async (sid: string) => {
-    setIsLoading(true);
-
-    try {
-      const history = await getSessionHistory(sid);
-
-      const historyMessages: Message[] = history.messages.map((msg, index) => ({
-        id: `history-${index}`,
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content,
-        timestamp: new Date(),
-      }));
-
-      setMessages(historyMessages);
-      setSessionId(sid);
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error('Failed to load history');
-      options.onError?.(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [options]);
+  }, [cleanupStreaming]);
 
   return {
     messages,
@@ -219,6 +252,5 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     sendMessage: handleSendMessage,
     stopStreaming,
     clearMessages,
-    loadSessionHistory,
   };
 }

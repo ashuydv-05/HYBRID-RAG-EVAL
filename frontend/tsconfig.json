@@ -18,9 +18,13 @@
       }
     ],
     "paths": {
-      "@/components/*": ["./component/*"],
-      "@/hooks/*": ["./hook/*"],
-      "@/types/*": ["./type/*"],
+      "@/*": ["./*"],
+      "@/components/*": ["./component/*", "./components/*"],
+      "@/component/*": ["./component/*"],
+      "@/hooks/*": ["./hook/*", "./hooks/*"],
+      "@/hook/*": ["./hook/*"],
+      "@/types/*": ["./type/*", "./types/*"],
+      "@/type/*": ["./type/*"],
       "@/lib/*": ["./lib/*"]
     }
   },

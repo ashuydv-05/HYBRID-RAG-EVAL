@@ -10,21 +10,25 @@ load_dotenv()
 
 
 def get_llm_client() -> ChatOpenAI:
-    max_tokens = int(os.getenv("NVIDIA_NIM_MAX_TOKENS", "2048"))
-    model = os.getenv("NVIDIA_NIM_MODEL", "openai/gpt-oss-120b")
+    max_tokens = int(os.getenv("GROQ_MAX_TOKENS", "2048"))
+    model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     return ChatOpenAI(
-        api_key=os.getenv("NVIDIA_NIM_API_KEY", ""),
+        api_key=os.getenv("GROQ_API_KEY", ""),
         base_url=os.getenv(
-            "NVIDIA_NIM_BASE_URL", "https://integrate.api.nvidia.com/v1"
+            "GROQ_BASE_URL", "https://api.groq.com/openai/v1"
         ),
         model=model,
         temperature=0.7,
-        model_kwargs={"max_tokens": max_tokens},
+        max_tokens=max_tokens,
     )
 
 
 def get_qdrant_client() -> QdrantClient:
-    return QdrantClient(url=settings.qdrant.url, api_key=settings.qdrant.api_key)
+    return QdrantClient(
+        url=settings.qdrant.url,
+        api_key=settings.qdrant.api_key,
+        check_compatibility=False,
+    )
 
 
 def get_es_client() -> Elasticsearch:

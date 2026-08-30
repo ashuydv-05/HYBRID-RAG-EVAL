@@ -18,18 +18,18 @@ from loguru import logger
 def get_nvidia_config() -> Dict[str, str]:
     env_vars = dotenv_values(".env")
     return {
-        "api_key": env_vars.get("NVIDIA_NIM_API_KEY", ""),
+        "api_key": env_vars.get("GROQ_API_KEY", ""),
         "base_url": env_vars.get(
-            "NVIDIA_NIM_BASE_URL", "https://integrate.api.nvidia.com/v1"
+            "GROQ_BASE_URL", "https://api.groq.com/openai/v1"
         ),
-        "model": env_vars.get("NVIDIA_NIM_MODEL", "meta/llama-3.3-70b-instruct"),
+        "model": env_vars.get("GROQ_MODEL", "openai/gpt-oss-120b"),
     }
 
 
 def create_ragas_llm():
     config = get_nvidia_config()
     if not config["api_key"]:
-        raise ValueError("NVIDIA_NIM_API_KEY not set")
+        raise ValueError("GROQ_API_KEY not set")
     client = AsyncOpenAI(api_key=config["api_key"], base_url=config["base_url"])
     llm = llm_factory(
         config["model"],

@@ -31,6 +31,7 @@ def gen_node(state: AgentState) -> dict:
     query = state.get("query", "")
     decision = state.get("decision", "process")
     document = state.get("document", [])
+    chat_history = state.get("chat_history", [])
     existing_timings = state.get("node_timings", {})
     llm = get_llm_client()
     if not llm:
@@ -53,14 +54,21 @@ def gen_node(state: AgentState) -> dict:
             "node_timings": existing_timings,
         }
     if decision == "clarify":
+        clarify_answer = "Could you please provide more details about what you're looking for?"
         return {
-            "answer": "Could you please provide more details about what you're looking for?",
+            "answer": clarify_answer,
             "source": [],
             "reasoning_step": ["GEN: Clarify requested"],
-            "chat_history": [],
+            "chat_history": [
+                {
+                    "role": "assistant",
+                    "content": clarify_answer,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
+            ],
             "node_timings": existing_timings,
         }
-    return _gen_rag_answer(llm, query, document, existing_timings)
+    return _gen_rag_answer(llm, query, document, existing_timings, chat_history=chat_history)
 
 
 def _gen_direct_answer(llm, query: str, existing_timings: dict) -> dict:
@@ -90,16 +98,31 @@ def _gen_direct_answer(llm, query: str, existing_timings: dict) -> dict:
 
 
 def _gen_rag_answer(
-    llm, query: str, document: list[dict], existing_timings: dict
+    llm,
+    query: str,
+    document: list[dict],
+    existing_timings: dict,
+    chat_history: list[dict] | None = None,
 ) -> dict:
     if not document:
         raise NodeInterrupt("Service temporarily unavailable", id="gen")
     context = format_documents(document)
+
+    user_prompt_content = RAG_USER_TEMPLATE.format(context=context, query=query)
+    if chat_history and len(chat_history) > 1:
+        history_lines = []
+        for msg in chat_history[:-1]:
+            role = "User" if msg.get("role") == "user" else "Assistant"
+            history_lines.append(f"{role}: {msg.get('content', '')}")
+        if history_lines:
+            conv_str = "\n".join(history_lines[-4:])
+            user_prompt_content = f"## Previous Conversation:\n{conv_str}\n\n{user_prompt_content}"
+
     messages = [
         {"role": "system", "content": GENERATE_SYSTEM_PROMPT},
         {
             "role": "user",
-            "content": RAG_USER_TEMPLATE.format(context=context, query=query),
+            "content": user_prompt_content,
         },
     ]
 

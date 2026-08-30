@@ -1,451 +1,326 @@
-# AI Research Assistant Chatbot
+# 🤖 arXiv AI Research Assistant & Empirical RAG Evaluation Platform
 
-Agentic RAG system for querying 100+ arXiv papers using AI agents and hybrid search.
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat&logo=python&logoColor=white)](https://python.org)
+[![LangGraph](https://img.shields.io/badge/Framework-LangGraph%20%7C%20FastAPI-FF4B4B.svg?style=flat)](https://github.com/langchain-ai/langgraph)
+[![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014%20%7C%20TailwindCSS-000000.svg?style=flat&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Qdrant](https://img.shields.io/badge/Vector%20DB-Qdrant-DC2626.svg?style=flat&logo=qdrant&logoColor=white)](https://qdrant.tech)
+[![Elasticsearch](https://img.shields.io/badge/Search-Elasticsearch%20BM25-005571.svg?style=flat&logo=elasticsearch&logoColor=white)](https://elastic.co)
+[![Groq](https://img.shields.io/badge/Inference-Groq%20LPU-F55036.svg?style=flat)](https://groq.com)
+[![Tests](https://img.shields.io/badge/Tests-38%2F38%20Passing%20(100%25)-success.svg?style=flat&logo=pytest&logoColor=white)](#testing)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](LICENSE)
+
+An enterprise-grade **Agentic Retrieval-Augmented Generation (RAG)** platform and **Empirical Evaluation Benchmark** for querying, summarizing, and reasoning over 13,000+ AI/ML arXiv research papers.
+
+Featuring **Hybrid Search (Dense Vector + BM25 + Reciprocal Rank Fusion + Cross-Encoder Reranking)**, **LangGraph Multi-Agent Workflows**, **Thread-Aware Multi-Turn Conversational Memory**, and an **Automated 2×2 Evaluation Matrix with Live Real-Time Streaming**.
 
 ---
 
-## Demo
+## 📑 Table of Contents
 
-![Demo](static/demo.gif)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Agentic StateGraph Workflow](#-agentic-stategraph-workflow)
+- [Empirical 2×2 Evaluation Benchmark](#-empirical-22-evaluation-benchmark)
+- [Tech Stack](#-tech-stack)
+- [Quick Start](#-quick-start)
+- [Environment Configuration](#-environment-configuration)
+- [Project Structure](#-project-structure)
+- [Testing & Quality Assurance](#-testing--quality-assurance)
 
 ---
 
-## Architecture
+## ✨ Key Features
 
-### System Overview
+### 🔍 1. Production Hybrid Retrieval Pipeline
+- **Dense Vector Search**: Qdrant vector database indexing 13,600+ arXiv paper embeddings (`text-embedding-3-small` / dense embeddings).
+- **Lexical Keyword Search**: Elasticsearch BM25 inverted index for exact acronyms, paper IDs, and terminology matching.
+- **Reciprocal Rank Fusion (RRF)**: Fuses rank lists from dense and sparse retrievers without arbitrary score normalization.
+- **Cross-Encoder Reranking**: `ms-marco-MiniLM-L-6-v2` cross-encoder reranker for context precision.
+
+### 🧠 2. Agentic Multi-Agent Control (LangGraph)
+- **Query Planner & Router**: Classifies intent, resolves follow-up questions, and conditionally routes queries.
+- **Document Validator / Grader**: LLM grader checks retrieved documents for relevance before generation.
+- **Web Search Fallback**: Automatically invokes Tavily search when arXiv corpus lacks sufficient coverage.
+- **Self-Correction Loops**: Retries retrieval or expands query parameters if initial context fails relevance thresholds.
+
+### 💬 3. Thread-Aware Multi-Turn Conversational Memory
+- **Session Checkpointing**: LangGraph `MemorySaver` preserves dialogue state per session thread (`thread_id`).
+- **Contextual Query Condensation**: Resolves ambiguous follow-up pronouns (*"what are the dates of these papers?"*, *"who wrote the first one?"*) into standalone search queries.
+
+### 📊 4. Automated 2×2 Evaluation Benchmark & Live Streaming
+- **2 Retrievers × 2 LLMs Matrix**: Benchmarks Vector vs. Hybrid search against 2 distinct LLM families (`qwen/qwen3.8-27b` vs. `openai/gpt-oss-20b`).
+- **LLM-as-Judge Scoring**: Evaluates **Correctness**, **Faithfulness / Groundedness**, **Answer Relevance**, **Precision@5**, **Recall@5**, **MRR**, and **Latency**.
+- **Real-Time Live SSE Stream**: Live progress bar and auto-scrolling terminal logs streaming per-question benchmark execution directly in the UI.
+
+### 🎨 5. Modern Next.js 14 Frontend & BYOK Deployment
+- Single-page application (SPA) with tab switching between Chat Assistant and Evaluation Matrix.
+- **Bring-Your-Own-Key (BYOK)**: In-UI Groq API key configuration saved locally in browser `localStorage`, making cloud deployment (Vercel / Render / Docker) zero-friction.
+
+---
+
+## 🏛️ System Architecture
 
 ```mermaid
 flowchart TB
-    subgraph Client["Client Layer"]
-        User[User Query]
-        Frontend[Next.js Frontend]
+    subgraph UI["Frontend Layer (Next.js 14 + Tailwind CSS)"]
+        Chat["💬 Research Chat Assistant"]
+        EvalUI["📊 2×2 Evaluation Matrix"]
+        Settings["🔑 BYOK API Key Manager"]
     end
 
-    subgraph Backend["Backend Layer"]
-        API[FastAPI]
-        Agent[LangGraph Agent<br/>ReAct-style]
+    subgraph API["Backend Layer (FastAPI)"]
+        ChatEndpoint["/api/chat (REST & SSE)"]
+        EvalEndpoint["/api/evaluation/stream (SSE)"]
+        HealthEndpoint["/api/health"]
     end
 
-    subgraph Storage["Storage Layer"]
-        Qdrant[Qdrant Vector DB]
-        Elasticsearch[Elasticsearch BM25]
+    subgraph Agent["Multi-Agent Workflow (LangGraph)"]
+        Planner["Query Planner & Rewriter"]
+        Validator["Document Validator Grader"]
+        Generator["Context-Aware Generator"]
+        Memory["Thread MemorySaver (Checkpointer)"]
     end
 
-    subgraph Retrieval["Retrieval Layer"]
-        Hybrid[Hybrid Search<br/>dense + BM25 + RRF<br/>+ Cross-Encoder]
-        Validate[Validation<br/>LLM Grader]
+    subgraph Storage["Retrieval & Storage Engine"]
+        Qdrant[("Qdrant Vector DB<br/>Dense Embeddings")]
+        Elasticsearch[("Elasticsearch 8<br/>BM25 Lexical Index")]
+        RRF["Reciprocal Rank Fusion (RRF)"]
+        CrossEncoder["Cross-Encoder Reranker"]
+        Tavily["Tavily Web Search (Fallback)"]
     end
 
-    subgraph Generation["Generation Layer"]
-        NIM[NVIDIA NIM<br/>gpt-oss-120b]
-        Tavily[Tavily Web Search]
-    end
-
-    User --> Frontend
-    Frontend --> API
+    UI --> API
     API --> Agent
-
-    Agent --> Hybrid
-    Hybrid --> Qdrant
-    Hybrid --> Elasticsearch
-    Hybrid --> Validate
-
-    Validate -->|relevant| NIM
-    Validate -->|insufficient| Tavily
-    Tavily --> NIM
-
-    NIM --> API
-    API --> Frontend
-    Frontend --> User
+    Agent --> Memory
+    Planner --> Qdrant & Elasticsearch
+    Qdrant & Elasticsearch --> RRF --> CrossEncoder --> Validator
+    Validator -->|Sufficient Context| Generator
+    Validator -->|Insufficient Context| Tavily --> Generator
+    Generator --> API --> UI
 ```
-
-### Component Details
-
-**1. Storage Layer**
-- **Qdrant Vector Store**: Stores document embeddings for semantic search
-- **Elasticsearch**: BM25 inverted index for keyword-based lexical search
-- **Metadata Storage**: Paper IDs, titles, sections, chunk relationships
-
-**2. Retrieval Layer**
-- **Hybrid Retrieval**: Combines BM25 (lexical) and vector (semantic) search
-  - Dense search: Qdrant (top-K=50)
-  - BM25 search: Elasticsearch (top-K=50)
-  - RRF (Reciprocal Rank Fusion): combines scores (top-K=20)
-  - Cross-Encoder Rerank: ms-marco-MiniLM-L-6-v2 (top-K=5)
-- **Document Validation**: LLM-based relevance grading
-  - If relevant: proceed to generation
-  - If insufficient: fallback to web search
-
-**3. Generation Layer**
-- **Agent**: LangGraph workflow with ReAct-style prompting
-- **NVIDIA NIM**: LLM inference (gpt-oss-120b)
-- **Web Search Fallback**: Tavily for current events
-
-**4. Interface Layer**
-- **Next.js Frontend**: Next.js with streaming response
-- **FastAPI Backend**: RESTful API with SSE streaming
-
-**5. Observability & Evaluation**
-- **Langfuse**: Tracks entire RAG pipeline
-- **RAGAS**: Automated evaluation metrics
 
 ---
 
-## Agent Workflow
+## 🔄 Agentic StateGraph Workflow
 
 ```mermaid
-flowchart TD
-    Start[Query] --> Planner
+stateDiagram-v2
+    [*] --> Planner: User Query + Thread History
     
-    Planner -->|greeting<br/>simple question| direct[Generate<br/>Direct Answer]
-    Planner -->|harmful<br/>inappropriate content| reject[Reject<br/>Politely Refuse]
-    Planner -->|unclear<br/>missing context| clarify[Clarify<br/>Ask for Details]
-    Planner -->|needs info<br/>requires lookup| Route
+    state Planner {
+        direction TB
+        FormatHistory --> RewriteQuery: Resolve follow-up pronouns
+        RewriteQuery --> RouteDecision: Direct / Vector / Web
+    }
+
+    Planner --> DirectAnswer: Greeting / Meta Question
+    Planner --> Retrieve: Research Question
+    Planner --> WebSearch: Current Events / Out of Scope
+
+    state Retrieve {
+        direction LR
+        DenseQdrant --> RRF_Fusion
+        BM25_Elasticsearch --> RRF_Fusion
+        RRF_Fusion --> CrossEncoderRerank
+    }
+
+    Retrieve --> DocumentValidator: Top-K Ranked Chunks
     
-    Route -->|ML/AI papers<br/>research topics| VectorSearch
-    Route -->|current events<br/>non-paper topics| WebSearch
+    DocumentValidator --> Generate: Context Relevant (Score >= Threshold)
+    DocumentValidator --> WebSearch: Context Insufficient (Fallback)
     
-    VectorSearch --> Validate[Validate<br/>Check relevance]
-    Validate -->|documents are<br/>relevant| Generate
-    Validate -->|no/few<br/>relevant docs| WebSearch
-    
-    WebSearch --> Generate
-    direct --> Response
-    reject --> Response
-    clarify --> Response
-    Generate --> Response
+    WebSearch --> Generate: Web Context
+    DirectAnswer --> [*]: Return Answer
+    Generate --> [*]: Return Grounded Answer + Citations
 ```
-
-### Decision Logic
-
-| Decision | Condition | Action |
-|----------|-----------|--------|
-| **direct_answer** | Greeting ("hello", "hi") or simple question ("who are you") | Generate direct response without retrieval |
-| **reject** | Harmful, inappropriate, or policy-violating content | Politely refuse |
-| **clarify** | Ambiguous query, missing context | Ask user for clarification |
-| **process** | Requires information lookup | Continue to routing |
-
-### Routing Logic
-
-| Route | Condition | Action |
-|-------|-----------|--------|
-| **vector_search** | Query about ML/AI papers, research topics | Search Qdrant + Elasticsearch |
-| **web_search** | Current events, news, non-paper topics | Search Tavily |
-
-### Validation Logic
-
-| Result | Condition | Action |
-|--------|-----------|--------|
-| **relevant** | LLM confirms retrieved documents answer the query | Generate answer from context |
-| **insufficient** | LLM confirms no/few relevant documents found | Fallback to Tavily web search |
-
-### Node Flow
-
-| Step | Node | Type | Description |
-|------|------|------|-------------|
-| 1 | Query | Start | User input |
-| 2 | Planner | Decision | Classify: direct/reject/clarify/process |
-| 3 | Route | Decision | Choose: vector_search / web_search |
-| 4 | VectorSearch | Storage | Hybrid: dense + BM25 + RRF + Cross-Encoder rerank |
-| 5 | Validate | Decision | Check relevance |
-| 6 | WebSearch | External | Tavily fallback |
-| 7 | Generate | Agent | Generate answer |
-| 8 | Response | Output | JSON with answer + sources + trace |
 
 ---
 
-## Project Structure
+## 🏆 Empirical 2×2 Evaluation Benchmark
+
+The system includes an automated evaluation suite testing **2 Retrieval Strategies × 2 LLM Architectures** over curated ground-truth test sets:
+
+| Configuration | Retrieval Method | LLM Model | Correctness | Faithfulness | Relevance | MRR | Latency | Overall Score |
+|---|---|---|---|---|---|---|---|---|
+| `vector + model_1` | Vector (Dense Qdrant) | `qwen/qwen3.8-27b` | 75.0% | 56.7% | 90.0% | 0.23 | 2.11s | 73.5% |
+| `vector + model_2` | Vector (Dense Qdrant) | `openai/gpt-oss-20b` | 95.0% | 75.0% | 96.7% | 0.23 | 2.77s | 88.7% |
+| `hybrid + model_1` | Hybrid (Dense + BM25 + RRF) | `qwen/qwen3.8-27b` | 90.0% | 96.7% | 93.3% | 0.42 | 16.92s | 93.3% |
+| **`hybrid + model_2` 🏆** | **Hybrid (Dense + BM25 + RRF)** | **`openai/gpt-oss-20b`** | **98.3%** | **90.0%** | **96.7%** | **0.42** | **1.25s** | **95.3% (Winner)** |
+
+> **Empirical Insight:** Hybrid retrieval (Dense + BM25 + RRF) improved Mean Reciprocal Rank (**MRR from 0.23 → 0.42**) and Groundedness (**Faithfulness up to 96.7%**), outperforming pure vector search on technical paper terminology.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| **Backend & Agents** | Python 3.12, LangGraph, LangChain, FastAPI, Pydantic v2, Uvicorn |
+| **Retrieval & Databases** | Qdrant (Vector DB), Elasticsearch 8 (BM25), Cross-Encoders (`sentence-transformers`) |
+| **LLM Inference** | Groq LPU (`qwen/qwen3.8-27b`, `openai/gpt-oss-20b`), Google Gemini 2.0 Flash (Judge) |
+| **Frontend UI** | Next.js 14 (App Router), React 18, Tailwind CSS, Lucide Icons, Plus Jakarta Sans |
+| **DevOps & Infrastructure** | Docker, Docker Compose, Bash CLI Runner (`run.sh`) |
+| **Testing & Evaluation** | Pytest, Pytest-Asyncio, LLM-as-Judge, RRF, Custom MRR/Precision Metrics |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- **Python 3.12+**
+- **Node.js 18+** & `npm`
+- **Docker Desktop** (for Qdrant & Elasticsearch)
+- **Groq API Key** ([Get free key](https://console.groq.com/keys))
+
+### 2. Clone & Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/AI-research-assistant-chatbot.git
+cd AI-research-assistant-chatbot
+
+# Make runner script executable
+chmod +x run.sh
+```
+
+### 3. Configure Environment
+
+```bash
+# Copy example configuration
+cp .env.example .env
+```
+
+Edit `.env` with your API keys:
+```env
+GROQ_API_KEY=gsk_your_groq_api_key_here
+GROQ_MODEL=qwen/qwen3.8-27b
+GROQ_MODEL_2=openai/gpt-oss-20b
+
+# Optional: For Gemini LLM-as-Judge
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.0-flash
+```
+
+### 4. Master Runner Commands (`run.sh`)
+
+Use the included [`run.sh`](file:///Users/ashuyadav/Desktop/HYBRID%20RAG/AI-research-assistant-chatbot/run.sh) script to control the entire project:
+
+```bash
+# 🚀 1. Start the Full Application Stack (Backend :8000 + Frontend :3000)
+./run.sh app
+
+# 📊 2. Run the Automated 2×2 Evaluation Benchmark
+./run.sh eval --max-questions 5
+
+# 🧪 3. Run the Automated Test Suite (38 unit & integration tests)
+./run.sh test
+
+# 📦 4. Index arXiv Papers into Elasticsearch (BM25 setup)
+./run.sh index
+
+# 🐳 5. Start Docker Databases (Qdrant & Elasticsearch)
+./run.sh docker
+```
+
+Once running:
+- **Chat & Evaluation UI**: [http://localhost:3000](http://localhost:3000)
+- **FastAPI Backend Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Qdrant Dashboard**: [http://localhost:6333/dashboard](http://localhost:6333/dashboard)
+
+---
+
+## ⚙️ Environment Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `GROQ_API_KEY` | - | Primary Groq API Key for fast LLM inference |
+| `GROQ_MODEL` | `qwen/qwen3.8-27b` | Primary generation model (LLM 1) |
+| `GROQ_MODEL_2` | `openai/gpt-oss-20b` | Baseline comparison model (LLM 2) |
+| `GEMINI_API_KEY` | - | *(Optional)* Google Gemini API Key for LLM Judge |
+| `GEMINI_MODEL` | `gemini-2.0-flash` | *(Optional)* Gemini model for evaluation |
+| `QDRANT_HOST` | `localhost` | Qdrant vector database host |
+| `QDRANT_PORT` | `6333` | Qdrant vector database port |
+| `ELASTICSEARCH_URL` | `http://localhost:9200` | Elasticsearch service URL for BM25 |
+| `TAVILY_API_KEY` | - | *(Optional)* Tavily Web Search API key for fallback |
+
+---
+
+## 📁 Project Structure
 
 ```
-research-assistant-chatbot/
+.
+├── run.sh                          # Master CLI runner (app, eval, test, index, docker)
+├── docker-compose.yml              # Qdrant & Elasticsearch database containers
+├── data/
+│   ├── evaluation/                 # Ground-truth evaluation dataset (20 annotated questions)
+│   │   ├── evaluation_dataset.json
+│   │   └── results/                # Benchmark output results & comparison matrices
+│   └── raw/                        # Processed arXiv paper metadata & chunks
 ├── src/
-│   ├── api/
-│   │   ├── main.py              # FastAPI entrypoint
-│   │   ├── models.py            # Pydantic models
-│   │   ├── dependencies.py      # DI
-│   │   └── route/
-│   │       ├── chat.py           # Chat endpoints
-│   │       └── health.py         # Health check
-│   ├── agent/
-│   │   ├── workflow.py          # LangGraph workflow
-│   │   ├── state.py             # AgentState schema
-│   │   ├── planner.py           # Query classification
-│   │   ├── vector_search.py     # Hybrid search node
-│   │   ├── validate.py          # Document grader
-│   │   ├── web_search.py        # Tavily fallback
-│   │   └── gen.py               # Answer generator
-│   ├── retrieval/
-│   │   └── hybrid_search.py     # Qdrant + ES + RRF
-│   ├── config/
-│   │   ├── settings.py          # Config dataclasses
-│   │   ├── prompt.py            # System prompts
-│   │   └── clients.py           # Service clients
-│   └── evaluation/
-│       └── ragas_evaluator.py   # RAGAS metrics
-├── frontend/                     # Next.js app
-├── script/                       # Indexing scripts
-├── test/                        # Tests
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
+│   ├── agent/                      # LangGraph Multi-Agent Architecture
+│   │   ├── state.py                # AgentState schema (messages, query, search_query)
+│   │   ├── planner.py              # Query analysis & pronoun resolution
+│   │   ├── vector_search.py        # Vector & hybrid retrieval node
+│   │   ├── validation.py           # Document relevance grading node
+│   │   ├── web_search.py           # Web search fallback node
+│   │   ├── gen.py                  # Context-grounded response generation
+│   │   └── workflow.py             # Compiled StateGraph with MemorySaver checkpointer
+│   ├── retrieval/                  # Retrieval Engine
+│   │   ├── vector_retriever.py     # Qdrant dense vector retriever
+│   │   ├── hybrid_retriever.py     # Dense + BM25 + RRF hybrid retriever
+│   │   └── hybrid_search.py        # Reciprocal Rank Fusion & Cross-Encoder reranking
+│   ├── evaluation/                 # Evaluation Subsystem
+│   │   ├── runner.py               # 2x2 Evaluation runner with streaming callbacks
+│   │   ├── evaluator.py            # LLM-as-Judge grading engine
+│   │   ├── metrics.py              # Precision@K, Recall@K, MRR calculations
+│   │   └── llm_clients.py          # Unified LLM interface (Groq, Gemini, OpenAI)
+│   └── api/                        # FastAPI REST & SSE Backend
+│       ├── main.py                 # FastAPI application factory & CORS setup
+│       ├── models.py               # Request/Response Pydantic schemas
+│       └── route/                  # API endpoints (/chat, /evaluation/stream, /health)
+├── frontend/                       # Next.js 14 Web Application
+│   ├── app/                        # App Router (/ and /evaluation)
+│   ├── component/                  # React components (Chat, MessageList, SettingsModal)
+│   │   ├── chat/                   # Chat container, input, message items
+│   │   └── evaluation/             # EvaluationView with live streaming progress terminal
+│   └── lib/api.ts                  # Client-side API caller with BYOK header forwarding
+└── test/                           # Automated Test Suite (38 tests)
+    ├── test_retrievers.py          # Vector, hybrid, and RRF unit tests
+    ├── test_llm_clients.py         # Multi-model client tests
+    ├── test_evaluation.py          # Evaluation metrics & judge tests
+    ├── test_workflow.py            # LangGraph routing & agent graph tests
+    ├── test_api.py                 # FastAPI route & model schema tests
+    └── test_memory_thread.py       # Multi-turn memory & pronoun resolution tests
 ```
 
 ---
 
-## Features
+## 🧪 Testing & Quality Assurance
 
-- Hybrid Search: Dense (Qdrant) + BM25 (Elasticsearch) + RRF Fusion
-- Agent: LangGraph workflow with ReAct-style prompting
-- Document Validation: LLM-based relevance grading
-- Streaming Response: Real-time answer generation
-- Session Management: Persistent chat history
-- Observability: Langfuse tracing
-- Evaluation: RAGAS metrics
-- Web Search Fallback: Tavily for current events
-
----
-
-## Technology Stack
-
-| Component | Technology | Purpose |
-|-----------|-----------|---------|
-| LLM API | NVIDIA NIM (gpt-oss-120b) | Inference |
-| Vector Store | Qdrant | Semantic search |
-| Lexical Search | Elasticsearch (BM25) | Keyword search |
-| Reranker | Cross-Encoder (ms-marco-MiniLM-L-6-v2) | Relevance reranking |
-| Embeddings | Sentence-Transformers (all-MiniLM-L6-v2) | Dense embeddings |
-| Agent Framework | LangGraph | Workflow orchestration |
-| Backend API | FastAPI | REST API with streaming |
-| Frontend | Next.js | Web UI |
-| Observability | Langfuse | Tracing |
-| Evaluation | RAGAS | Quality metrics |
-
----
-
-## Evaluation
-
-Evaluated using **RAGAS** (RAG Assessment) framework with 50 test queries.
-
-| Metric | Score | Description |
-|--------|-------|-------------|
-| Faithfulness | 0.785 | How well the answer is grounded in the retrieved context |
-| Answer Relevancy | 0.795 | How relevant the answer is to the question |
-| Context Precision | 0.724 | Quality of retrieval ranking |
-| Answer Similarity | 0.651 | Semantic similarity between generated answer and ground truth |
-
----
-
-## Tracing
-
-The system uses **Langfuse** for observability and tracing. Langfuse provides detailed insights into the entire RAG pipeline, including:
-
-- Token usage and cost tracking
-- Latency per component (retrieval, generation)
-- Trace logs for debugging
-- User feedback collection
-
-![Langfuse Dashboard](static/langfuse.png)
-
----
-
-## Setup
-
-### Prerequisites
-
-- Docker & Docker Compose (for Docker setup)
-- NVIDIA NIM API Key
-- Python 3.12+
-- Node.js 16+ (for frontend)
-
-### Option 1: Docker (Recommended)
-
-**Note**: First run takes 10-20 minutes to build Docker images and process PDF indexing.
-
-#### 1. Environment
+The codebase is backed by **38 automated unit and integration tests** ensuring 100% test pass rate across all layers:
 
 ```bash
-cp .env.example .env
-# Edit .env with required API keys
+# Run all tests via run.sh
+./run.sh test
+
+# Or run directly with pytest
+pytest test/ -v
 ```
 
-#### 2. Start Services
-
-```bash
-# Start all services (infrastructure + backend + frontend + indexing)
-docker compose up -d
-
-# View logs to monitor indexing process
-docker compose logs -f backend
 ```
+============================== test session starts ==============================
+test/test_retrievers.py .....                                            [ 13%]
+test/test_llm_clients.py ...                                             [ 21%]
+test/test_evaluation.py ......                                           [ 36%]
+test/test_workflow.py ...........                                        [ 65%]
+test/test_api.py .........                                               [ 89%]
+test/test_memory_thread.py ....                                          [100%]
 
-#### 3. Verify
-
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000/docs
-- Qdrant: http://localhost:6333/dashboard
-
----
-
-### Option 2: Hybrid (Terminal + Docker)
-
-#### 1. Environment
-
-```bash
-cp .env.example .env
-# Edit .env with required API keys
-```
-
-#### 2. Install Dependencies
-
-```bash
-# Backend
-pip install uv
-uv venv .venv --python 3.12
-uv sync
-
-# Frontend
-cd frontend
-npm install
-```
-
-#### 3. Start Infrastructure
-
-```bash
-# Start Qdrant and Elasticsearch
-docker compose up -d qdrant elasticsearch
-```
-
-#### 4. Index Data (run only once)
-
-```bash
-source .venv/bin/activate
-python script/download_paper.py
-python script/process_pdf.py
-python script/qdrant.py recreate
-python script/elasticsearch_index.py recreate
-```
-
-#### 5. Start Application
-
-```bash
-# Terminal 1: Backend
-uv run uvicorn src.api.main:app --reload --port 8000
-
-# Terminal 2: Frontend
-cd frontend && npm run dev
-```
-
-Access: http://localhost:3000
-
----
-
-## API Endpoints
-
-### Chat
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/chat | Send message, get JSON response |
-| POST | /api/chat/stream | Streaming response (SSE) |
-| GET | /api/chat/sessions/{id} | Get session history |
-| DELETE | /api/chat/sessions/{id} | Delete session |
-
-### Health
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/health | Health check |
-| GET | /docs | Swagger UI |
-
-### Evaluation
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/evaluation/run | Run RAGAS evaluation |
-
----
-
-## Usage Example
-
-```bash
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "What is BERT?", "session_id": "test-123"}'
-```
-
-Response:
-```json
-{
-  "answer": "BERT is a transformer-based model...",
-  "sources": [
-    {"id": 1, "title": "BERT: Pre-training...", "score": 0.94, "source": "dense"}
-  ],
-  "reasoning_step": [
-    "Router: process -> vector_search",
-    "Retrieved: 5 documents",
-    "Validation: relevant",
-    "Generate: synthesized answer"
-  ],
-  "trace_id": "abc-123-xyz"
-}
+======================== 38 passed, 14 warnings in 4.21s ========================
 ```
 
 ---
 
-## Configuration
+## 📄 License
 
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| NVIDIA_NIM_API_KEY | NVIDIA NIM API key | Required |
-| NVIDIA_NIM_MODEL | LLM model | openai/gpt-oss-120b |
-| NVIDIA_NIM_BASE_URL | NVIDIA NIM base URL | https://integrate.api.nvidia.com/v1 |
-| QDRANT_URL | Qdrant URL | http://localhost:6333 |
-| QDRANT_COLLECTION | Qdrant collection | arxiv_papers |
-| ES_URL | Elasticsearch URL | http://localhost:9200 |
-| ES_INDEX | Elasticsearch index | arxiv_papers |
-| TAVILY_API_KEY | Tavily API key | Optional |
-| RERANKER_TOP_K | Reranker top-k | 5 |
-| RRF_K | RRF fusion k | 60 |
-
-### Ports
-
-| Service | Port | URL |
-|---------|------|-----|
-| Frontend | 3000 | http://localhost:3000 |
-| Backend | 8000 | http://localhost:8000 |
-| Qdrant | 6333 | http://localhost:6333 |
-| Elasticsearch | 9200 | http://localhost:9200 |
-
----
-
-## Troubleshooting
-
-### Qdrant not working
-
-```bash
-docker compose logs qdrant
-docker compose restart qdrant
-```
-
-### Elasticsearch health
-
-```bash
-curl http://localhost:9200/_cluster/health
-# Should return "green" or "yellow"
-```
-
-### Backend cannot connect
-
-```bash
-docker compose logs backend
-docker compose exec backend env | grep -E "NVIDIA|ES_|QDRANT"
-```
-
-### NVIDIA NIM API error
-
-```bash
-curl https://integrate.api.nvidia.com/v1/models \
-  -H "Authorization: Bearer $NVIDIA_NIM_API_KEY"
-```
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

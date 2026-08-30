@@ -9,15 +9,15 @@ export interface Message {
 }
 
 export interface Source {
-  id: number;
+  id?: number;
   title: string;
-  score: number;
+  score?: number;
   year?: number;
   arxiv_id?: string;
   paper_id?: string;
   section?: string;
-  categories: string[];
-  authors: string[];
+  categories?: string[];
+  authors?: string[];
   pdf_url?: string;
 }
 

@@ -10,6 +10,7 @@ class Message(TypedDict):
 
 class AgentState(TypedDict):
     query: str
+    search_query: Optional[str]
     decision: Literal["direct_answer", "reject", "clarify", "process"]
     route: Optional[Literal["vector_search", "web_search"]]
     document: list[dict]

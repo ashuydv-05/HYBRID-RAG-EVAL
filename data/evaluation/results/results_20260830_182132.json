@@ -1,0 +1,890 @@
+{
+  "timestamp": "2026-08-30T18:21:32.682764+00:00",
+  "dataset_path": "data/evaluation/evaluation_dataset.json",
+  "judge_model": "openai/gpt-oss-120b",
+  "top_k": 5,
+  "configurations": {
+    "vector+model_1": {
+      "retrieval": "vector",
+      "llm": "model_1",
+      "total_samples": 3,
+      "avg_correctness": 80.0,
+      "avg_faithfulness": 61.67,
+      "avg_relevance": 86.67,
+      "avg_overall": 76.5,
+      "avg_precision_at_k": 0.2,
+      "avg_recall_at_k": 0.6667,
+      "avg_mrr": 0.2333,
+      "avg_latency_ms": 9717.9
+    },
+    "vector+model_2": {
+      "retrieval": "vector",
+      "llm": "model_2",
+      "total_samples": 3,
+      "avg_correctness": 95.0,
+      "avg_faithfulness": 50.0,
+      "avg_relevance": 93.33,
+      "avg_overall": 81.0,
+      "avg_precision_at_k": 0.2,
+      "avg_recall_at_k": 0.6667,
+      "avg_mrr": 0.2333,
+      "avg_latency_ms": 1600.52
+    },
+    "hybrid+model_1": {
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "total_samples": 3,
+      "avg_correctness": 0.0,
+      "avg_faithfulness": 100.0,
+      "avg_relevance": 0.0,
+      "avg_overall": 30.0,
+      "avg_precision_at_k": 0.0,
+      "avg_recall_at_k": 0.0,
+      "avg_mrr": 0.0,
+      "avg_latency_ms": 4661.39
+    },
+    "hybrid+model_2": {
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "total_samples": 3,
+      "avg_correctness": 0.0,
+      "avg_faithfulness": 100.0,
+      "avg_relevance": 3.33,
+      "avg_overall": 31.0,
+      "avg_precision_at_k": 0.0,
+      "avg_recall_at_k": 0.0,
+      "avg_mrr": 0.0,
+      "avg_latency_ms": 1770.2
+    }
+  },
+  "best_configuration": "vector+model_2",
+  "best_reason": "Vector Retrieval + model_2 achieved the highest composite score (81.0%) with Correctness=95.0%, Faithfulness=50.0%, Relevance=93.33%, and average latency of 1600.5ms.",
+  "comparison_matrix": {
+    "vector": {
+      "model_1": 76.5,
+      "model_2": 81.0
+    },
+    "hybrid": {
+      "model_1": 30.0,
+      "model_2": 31.0
+    }
+  },
+  "detailed_results": [
+    {
+      "question_id": 1,
+      "retrieval": "vector",
+      "llm": "model_1",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "The Transformer is a neural‑network architecture whose core operation is **self‑attention**.  \nIn a self‑attention layer each element of an input sequence is replaced by a weighted average of (some or all of) the other elements.  For an output token \\(y_i\\) the computation is  \n\n\\[\ny_i=\\sum_j w_{i,j}\\,x_j ,\n\\]\n\nwhere the scalar weight \\(w_{i,j}\\) is produced from the pair of input representations \\(x_i\\) and \\(x_j\\).  By zero‑ing out selected weights with an **attention mask**, the model can be constrained to attend only to certain positions (e.g., only to earlier tokens in a causal mask) (“Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”).\n\n### Main architectural variants\n\n| Variant | Description | Masking |\n|---------|-------------|---------|\n| **Standard encoder‑decoder** | Two separate stacks of Transformer layers: an **encoder** that processes the full input with *fully‑visible* masking, and a **decoder** that generates the output sequence. The decoder attends to the encoder output (also fully‑visible) and to its own previously generated tokens with a *causal* mask. | Encoder = fully‑visible; Decoder = causal; Encoder‑decoder attention = fully‑visible (Figure 4, left) |\n| **Language model (single stack)** | A single stack of Transformer layers receives the concatenation of the input and the target sequence and uses a *causal* mask throughout, so each position can only attend to earlier positions. | Causal mask everywhere (Figure 4, middle) |\n| **Prefix‑language model** | Same as the language‑model stack, but the prefix (the original input) is allowed *fully‑visible* attention while the target side remains causal. This lets the model see the whole input when predicting each target token. | Prefix = fully‑visible; Target = causal (Figure 4, right) |\n\nThese variants are built from the same basic block: a multi‑head self‑attention sub‑layer followed by a position‑wise feed‑forward network, each wrapped with residual connections and layer normalization (as in the original Vaswani et al., 2017 design).  \n\n### Concrete instantiations\n\n* **T5 / “Text‑to‑Text Transfer Transformer”** (the model studied in “Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”) uses the standard encoder‑decoder configuration described above, pre‑trained with a denoising objective and later fine‑tuned on downstream tasks.  \n\n* **BERT** (“BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding”) adopts only the **encoder** part of the Transformer, stacking multiple identical encoder blocks.  It is **bidirectional** because each encoder layer uses *fully‑visible* masking, allowing every token to attend to every other token in the same layer.  The paper reports two common sizes:  \n\n  * **BERT‑BASE** – 12 layers (L = 12), hidden size H = 768, 12 attention heads (A = 12), ≈110 M parameters.  \n  * **BERT‑LARGE** – 24 layers (L = 24), hidden size H = 1024, 16 attention heads (A = 16), ≈340 M parameters.  \n\nBoth BERT and the T5‑style models share the same fundamental Transformer building block; they differ mainly in how many stacks are used (encoder‑only vs. encoder‑decoder) and in the masking strategy applied during training and inference.  \n\nIn summary, the Transformer architecture is a stack‑based model built from self‑attention layers (with configurable masks) and feed‑forward sub‑layers, which can be arranged as an encoder‑decoder pair, a single decoder‑style language model, or an encoder‑only model such as BERT.  The choice of masking (fully‑visible vs. causal) determines whether the model can attend to future tokens, enabling the various task‑specific configurations.",
+      "retrieved_documents": [
+        {
+          "id": 416,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.6261,
+          "source": "dense",
+          "content_snippet": "A major distinguishing factor for different architectures is the \"mask\" used by different attention mechanisms in the model. Recall that the self-attention operation in a Transformer takes a sequence ",
+          "metadata": {
+            "content": "A major distinguishing factor for different architectures is the \"mask\" used by different attention mechanisms in the model. Recall that the self-attention operation in a Transformer takes a sequence as input and outputs a new sequence of the same length. Each entry of the output sequence is produced by computing a weighted average of entries of the input sequence. Specifically, let yi refer to the ith element of the output sequence and xj refer to the jth entry of the input sequence. yiis computed as P j w i,jxj , where wi,j is the scalar weight produced by the self-attention mechanism as a function of xi and xj . The attention mask is then used to zero out certain weights in order to constrain which entries of the input can be attended to at a given output timestep. Diagrams of the masks we will consider are shown in Figure 3. For example, the causal mask (Figure 3, middle) sets any wi,j to zero if j > i .",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "3.2.1 Model Structures",
+            "content_type": "text",
+            "page_info": 15
+          }
+        },
+        {
+          "id": 422,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.5844,
+          "source": "dense",
+          "content_snippet": "Figure 4: Schematics of the Transformer architecture variants we consider. In this diagram, blocks represent elements of a sequence and lines represent attention visibility. Different colored groups o",
+          "metadata": {
+            "content": "Figure 4: Schematics of the Transformer architecture variants we consider. In this diagram, blocks represent elements of a sequence and lines represent attention visibility. Different colored groups of blocks indicate different Transformer layer stacks. Dark grey lines correspond to fully-visible masking and light grey lines correspond to causal masking. We use \".\" to denote a special end-of-sequence token that represents the end of a prediction. The input and output sequences are represented as x and y respectively. Left: A standard encoder-decoder architecture uses fullyvisible masking in the encoder and the encoder-decoder attention, with causal masking in the decoder. Middle: A language model consists of a single Transformer layer stack and is fed the concatenation of the input and target, using a causal mask throughout. Right: Adding a prefix to a language model corresponds to allowing fully-visible masking over the input.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "3.2.1 Model Structures",
+            "content_type": "caption",
+            "page_info": 17
+          }
+        },
+        {
+          "id": 366,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.5722,
+          "source": "dense",
+          "content_snippet": "The primary building block of the Transformer is self-attention (Cheng et al. , 2016). Self-attention is a variant of attention (Graves , 2013; Bahdanau et al. , 2015) that processes a sequence by rep",
+          "metadata": {
+            "content": "The primary building block of the Transformer is self-attention (Cheng et al. , 2016). Self-attention is a variant of attention (Graves , 2013; Bahdanau et al. , 2015) that processes a sequence by replacing each element by a weighted average of the rest of the sequence. The original Transformer consisted of an encoder-decoder architecture and was intended for sequence-to-sequence (Sutskever et al. , 2014; Kalchbrenner et al. , 2014) tasks. It has recently also become common to use models consisting of a single Transformer layer stack, with varying forms of self-attention used to produce architectures appropriate for language modeling (Radford et al. , 2018; Al-Rfou et al. , 2019) or classification and span prediction tasks (Devlin et al. , 2018; Yang et al. , 2019). We empirically explore these architectural variants in Section 3.2 .",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "2.1 Model",
+            "content_type": "text",
+            "page_info": 4
+          }
+        },
+        {
+          "id": 396,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.5436,
+          "source": "dense",
+          "content_snippet": "Our goal for our baseline is to reflect typical, modern practice. We pre-train a standard Transformer (described in Section 2.1) using a simple denoising objective and then separately fine-tune on eac",
+          "metadata": {
+            "content": "Our goal for our baseline is to reflect typical, modern practice. We pre-train a standard Transformer (described in Section 2.1) using a simple denoising objective and then separately fine-tune on each of our downstream tasks. We describe the details of this experimental setup in the following subsections.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "3.1 Baseline",
+            "content_type": "text",
+            "page_info": 11
+          }
+        },
+        {
+          "id": 82,
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "paper_id": "1810.04805",
+          "score": 0.539,
+          "source": "dense",
+          "content_snippet": "Model Architecture BERT's model architecture is a multi-layer bidirectional Transformer encoder based on the original implementation described in Vaswani et al. (2017) and released in the tensor2tenso",
+          "metadata": {
+            "content": "Model Architecture BERT's model architecture is a multi-layer bidirectional Transformer encoder based on the original implementation described in Vaswani et al. (2017) and released in the tensor2tensor library. 1 Because the use of Transformers has become common and our implementation is almost identical to the original, we will omit an exhaustive background description of the model architecture and refer readers to Vaswani et al. (2017) as well as excellent guides such as \"The Annotated Transformer.\" 2\nIn this work, we denote the number of layers (i.e., Transformer blocks) as L, the hidden size as H, and the number of self-attention heads as A . 3 We primarily report results on two model sizes: BERTBASE (L=12, H=768, A=12, Total Parameters=110M) and BERTLARGE (L=24, H=1024, A=16, Total Parameters=340M).",
+            "paper_id": "1810.04805",
+            "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+            "year": 2018,
+            "section": "3 BERT",
+            "content_type": "text",
+            "page_info": 3
+          }
+        }
+      ],
+      "judge_scores": {
+        "correctness": 90.0,
+        "faithfulness": 45.0,
+        "relevance": 90.0,
+        "overall": 76.5,
+        "reason": "The answer correctly describes the transformer as an attention‑based architecture, but it adds many details (e.g., BERT sizes, multi‑head specifics) not present in the retrieved context, reducing faithfulness while remaining highly relevant."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 2893.84,
+      "error": null
+    },
+    {
+      "question_id": 2,
+      "retrieval": "vector",
+      "llm": "model_1",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "Self‑attention is the core operation that lets a Transformer model relate every token in a sequence to every other token when computing its representation.\n\n1. **Query‑Key‑Value projection**  \n   For each token the model first creates three vectors: a **query** (Q), a **key** (K) and a **value** (V). These are obtained by multiplying the token’s embedding (or the output of the previous layer) with three learned weight matrices. All Q, K and V vectors have the same dimensionality *d* (e.g., *d* = 512 in the original Transformer)【Attention Is All You Need】.\n\n2. **Dot‑product similarity**  \n   The similarity between a query and every key is measured with a scaled dot product:  \n\n   \\[\n   \\text{score}_{ij}= \\frac{Q_i \\cdot K_j}{\\sqrt{d}}\n   \\]\n\n   The scaling factor \\(\\sqrt{d}\\) prevents the dot‑product values from growing too large as *d* increases【Attention Is All You Need】.\n\n3. **Softmax weighting**  \n   The scores for a given query are passed through a softmax, turning them into a probability distribution over all positions:\n\n   \\[\n   \\alpha_{ij}= \\text{softmax}_j(\\text{score}_{ij})\n   \\]\n\n   These \\(\\alpha_{ij}\\) indicate how much attention token *i* should pay to token *j*.\n\n4. **Weighted sum of values**  \n   The output for token *i* is the weighted sum of the value vectors, using the attention weights:\n\n   \\[\n   \\text{output}_i = \\sum_j \\alpha_{ij} V_j\n   \\]\n\n   This produces a new representation that aggregates information from the whole sequence, with more weight given to tokens that are more relevant according to the learned similarity.\n\n5. **Multi‑head extension**  \n   The process above is performed in parallel across several “heads”. Each head uses its own set of Q, K, V projection matrices, allowing the model to capture different types of relationships (e.g., long‑distance dependencies, anaphora resolution). The outputs of all heads are concatenated and linearly projected back to the model dimension【Attention Is All You Need】.\n\n6. **Integration into the network**  \n   - In the **encoder**, each of the *N* = 6 identical layers contains a multi‑head self‑attention sub‑layer followed by a position‑wise feed‑forward network. Residual connections and layer‑normalization are applied around each sub‑layer:  \n\n     \\[\n     \\text{LayerNorm}(x + \\text{Sublayer}(x))\n     \\]\n\n     where *x* is the input to the sub‑layer【Attention Is All You Need】.  \n   - In the **decoder**, self‑attention is causal (autoregressive): a token can only attend to earlier tokens, preventing information leakage about future outputs. After the decoder’s self‑attention, an additional encoder‑decoder attention layer lets the decoder attend to the encoder’s final hidden states【Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer】.\n\n7. **Weight sharing**  \n   The final dense layer that maps the decoder’s output to vocabulary logits shares its weight matrix with the input embedding matrix, tying input and output representations together【Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer】.\n\nOverall, self‑attention enables each token to dynamically gather contextual information from the entire sequence, and the multi‑head design lets the model learn a variety of linguistic patterns such as long‑range dependencies, anaphora resolution, and syntactic structure, as illustrated by the attention visualizations in the original Transformer paper【Attention Is All You Need】.",
+      "retrieved_documents": [
+        {
+          "id": 368,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.6844,
+          "source": "dense",
+          "content_snippet": "3. http://nlp.seas.harvard.edu/2018/04/03/attention.html\n4. http://jalammar.github.io/illustrated-transformer/\nmechanism after each self-attention layer that attends to the output of the encoder. The ",
+          "metadata": {
+            "content": "3. http://nlp.seas.harvard.edu/2018/04/03/attention.html\n4. http://jalammar.github.io/illustrated-transformer/\nmechanism after each self-attention layer that attends to the output of the encoder. The self-attention mechanism in the decoder also uses a form of autoregressive or causal selfattention, which only allows the model to attend to past outputs. The output of the final decoder block is fed into a dense layer with a softmax output, whose weights are shared with the input embedding matrix. All attention mechanisms in the Transformer are split up into independent \"heads\" whose outputs are concatenated before being further processed.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "2.1 Model",
+            "content_type": "text",
+            "page_info": 5
+          }
+        },
+        {
+          "id": 9,
+          "title": "Attention Is All You Need",
+          "paper_id": "1706.03762",
+          "score": 0.6336,
+          "source": "dense",
+          "content_snippet": "Encoder: The encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, positionwise fully",
+          "metadata": {
+            "content": "Encoder: The encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, positionwise fully connected feed-forward network. We employ a residual connection [11] around each of the two sub-layers, followed by layer normalization [1]. That is, the output of each sub-layer is LayerNorm(x + Sublayer(x)), where Sublayer(x) is the function implemented by the sub-layer itself. To facilitate these residual connections, all sub-layers in the model, as well as the embedding layers, produce outputs of dimension dmodel = 512 .",
+            "paper_id": "1706.03762",
+            "title": "Attention Is All You Need",
+            "year": 2017,
+            "section": "3.1 Encoder and Decoder Stacks",
+            "content_type": "text",
+            "page_info": 3
+          }
+        },
+        {
+          "id": 660,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.6053,
+          "source": "dense",
+          "content_snippet": "- Alexei Baevski, Sergey Edunov, Yinhan Liu, Luke Zettlemoyer, and Michael Auli. Clozedriven pretraining of self-attention networks. arXiv preprint arXiv:1903.07785, 2019.\n- Dzmitry Bahdanau, Kyunghyu",
+          "metadata": {
+            "content": "- Alexei Baevski, Sergey Edunov, Yinhan Liu, Luke Zettlemoyer, and Michael Auli. Clozedriven pretraining of self-attention networks. arXiv preprint arXiv:1903.07785, 2019.\n- Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. Neural machine translation by jointly learning to align and translate. In Third International Conference on Learning Representations, 2015.\n- Ankur Bapna, Naveen Arivazhagan, and Orhan Firat. Simple, scalable adaptation for neural machine translation. arXiv preprint arXiv:1909.08478, 2019.\n- Iz Beltagy, Kyle Lo, and Arman Cohan. SciBERT: A pretrained language model for scientific text. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), 2019.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "References",
+            "content_type": "list_item",
+            "page_info": 58
+          }
+        },
+        {
+          "id": 5800,
+          "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+          "paper_id": "2205.14135",
+          "score": 0.5988,
+          "source": "dense",
+          "content_snippet": "- [65] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, et al. Pytorch: An imperative style, highperfor",
+          "metadata": {
+            "content": "- [65] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, et al. Pytorch: An imperative style, highperformance deep learning library. Advances in neural information processing systems, 32, 2019.\n- [66] Markus N Rabe and Charles Staats. Self-attention does not need 𝑂(𝑛 2 ) memory. arXiv preprint arXiv:2112.05682, 2021.\n- [67] Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. Language models are unsupervised multitask learners. OpenAI blog, 1(8):9, 2019.",
+            "paper_id": "2205.14135",
+            "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+            "year": 2022,
+            "section": "References",
+            "content_type": "list_item",
+            "page_info": 14
+          }
+        },
+        {
+          "id": 66,
+          "title": "Attention Is All You Need",
+          "paper_id": "1706.03762",
+          "score": 0.5846,
+          "source": "dense",
+          "content_snippet": "Figure 3: An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the ve",
+          "metadata": {
+            "content": "Figure 3: An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb 'making', completing the phrase 'making...more difficult'. Attentions here shown only for the word 'making'. Different colors represent different heads. Best viewed in color.\nInput-Input Layer5\nFigure 4: Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution. Top: Full attentions for head 5. Bottom: Isolated attentions from just the word 'its' for attention heads 5 and 6. Note that the attentions are very sharp for this word.\nInput-Input Layer5\nFigure 5: Many of the attention heads exhibit behaviour that seems related to the structure of the sentence. We give two such examples above, from two different heads from the encoder self-attention at layer 5 of 6. The heads clearly learned to perform different tasks.",
+            "paper_id": "1706.03762",
+            "title": "Attention Is All You Need",
+            "year": 2017,
+            "section": "Attention Visualizations\r\nInput-Input Laye Attention Visualizations\r\nInput-Input Layer5",
+            "content_type": "caption",
+            "page_info": 15
+          }
+        }
+      ],
+      "judge_scores": {
+        "correctness": 95.0,
+        "faithfulness": 45.0,
+        "relevance": 95.0,
+        "overall": 80.0,
+        "reason": "The answer correctly explains self‑attention with query‑key‑value mechanics, matching the ground truth and adding accurate detail, but most of that detail is not present in the retrieved snippets, leading to moderate faithfulness, while staying fully relevant to the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.4,
+        "recall_at_k": 1.0,
+        "mrr": 0.5,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 16174.07,
+      "error": null
+    },
+    {
+      "question_id": 3,
+      "retrieval": "vector",
+      "llm": "model_1",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "BERT is a pretrained language‑understanding model that uses the Transformer architecture. It receives as input a concatenation of two token segments ( x₁…x_N  and y₁…y_M ) delimited by special tokens [CLS] and [SEP] (and terminated with [EOS]), with the total length constrained by a maximum‑sequence‑length parameter T ([2] RoBERTa: A Robustly Optimized BERT Pretraining Approach). The model is first pretrained on a large unlabeled text corpus using two objectives—masked language modeling (MLM) and next‑sentence prediction (NSP)—and then fine‑tuned on task‑specific labeled data for downstream applications such as classification or token‑level labeling ([3] Benchmarking for Public Health Surveillance tasks on Social Media with a Domain‑Specific Pretrained Language Model; [5] BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).\n\nThe documents provided do not contain the full form of the acronym “BERT.” Consequently, the expansion of the name cannot be given from the supplied context.",
+      "retrieved_documents": [
+        {
+          "id": 175,
+          "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+          "paper_id": "1907.11692",
+          "score": 0.567,
+          "source": "dense",
+          "content_snippet": "In this section, we describe the experimental setup for our replication study of BERT.",
+          "metadata": {
+            "content": "In this section, we describe the experimental setup for our replication study of BERT.",
+            "paper_id": "1907.11692",
+            "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+            "year": 2019,
+            "section": "3 Experimental Setup",
+            "content_type": "text",
+            "page_info": 2
+          }
+        },
+        {
+          "id": 169,
+          "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+          "paper_id": "1907.11692",
+          "score": 0.5483,
+          "source": "dense",
+          "content_snippet": "BERT takes as input a concatenation of two segments (sequences of tokens), x1, . . . , xN and y1, . . . , yM. Segments usually consist of more than one natural sentence. The two segments are presented",
+          "metadata": {
+            "content": "BERT takes as input a concatenation of two segments (sequences of tokens), x1, . . . , xN and y1, . . . , yM. Segments usually consist of more than one natural sentence. The two segments are presented as a single input sequence to BERT with special tokens delimiting them: [CLS], x1, . . . , xN , [SEP], y1, . . . , yM , [EOS] . M and N are constrained such that M + N < T , where T is a parameter that controls the maximum sequence length during training.\nThe model is first pretrained on a large unlabeled text corpus and subsequently finetuned using end-task labeled data.",
+            "paper_id": "1907.11692",
+            "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+            "year": 2019,
+            "section": "2.1 Setup",
+            "content_type": "text",
+            "page_info": 2
+          }
+        },
+        {
+          "id": 4962,
+          "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+          "paper_id": "2204.04521",
+          "score": 0.5465,
+          "source": "dense",
+          "content_snippet": "PHS-BERT has the same architecture as BERT. BERT was trained on 2 tasks: mask language mod-\nFigure 1: An overview of pretraining, fine-tuning, and the various tasks and datasets used in PHS benchmarki",
+          "metadata": {
+            "content": "PHS-BERT has the same architecture as BERT. BERT was trained on 2 tasks: mask language mod-\nFigure 1: An overview of pretraining, fine-tuning, and the various tasks and datasets used in PHS benchmarking\neling (MLM) (15% of tokens were masked and next sentence prediction (NSP) (Given the first sentence, BERT was trained to predict whether a selected next sentence was likely or not). BERT is pretrained on Wikipedia and BooksCorpus and needs task-specific fine-tuning. Pretrained BERT models include BERTBase (12 layers, 12 attention heads, and 110 million parameters), as well as BERTLarge (24 layers, 16 attention heads, and 340 million parameters).",
+            "paper_id": "2204.04521",
+            "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+            "year": 2022,
+            "section": "3.1 BERT",
+            "content_type": "text",
+            "page_info": 3
+          }
+        },
+        {
+          "id": 4961,
+          "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+          "paper_id": "2204.04521",
+          "score": 0.5406,
+          "source": "dense",
+          "content_snippet": "PHS-BERT has the same architecture as BERT. Fig. 1 illustrates an overview of pretraining, finetuning, and datasets used in this study. We describe BERT and then the pretraining and fine-tuning proces",
+          "metadata": {
+            "content": "PHS-BERT has the same architecture as BERT. Fig. 1 illustrates an overview of pretraining, finetuning, and datasets used in this study. We describe BERT and then the pretraining and fine-tuning process employed in PHS-BERT.",
+            "paper_id": "2204.04521",
+            "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+            "year": 2022,
+            "section": "3 Method",
+            "content_type": "text",
+            "page_info": 2
+          }
+        },
+        {
+          "id": 153,
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "paper_id": "1810.04805",
+          "score": 0.5389,
+          "source": "dense",
+          "content_snippet": "The illustration of fine-tuning BERT on different tasks can be seen in Figure 4. Our task-specific models are formed by incorporating BERT with one additional output layer, so a minimal number of para",
+          "metadata": {
+            "content": "The illustration of fine-tuning BERT on different tasks can be seen in Figure 4. Our task-specific models are formed by incorporating BERT with one additional output layer, so a minimal number of parameters need to be learned from scratch. Among the tasks, (a) and (b) are sequence-level tasks while (c) and (d) are token-level tasks. In the figure, E represents the input embedding, Ti represents the contextual representation of token i , [CLS] is the special symbol for classification output, and [SEP] is the special symbol to separate non-consecutive token sequences.",
+            "paper_id": "1810.04805",
+            "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+            "year": 2018,
+            "section": "A.5 Illustrations of Fine-tuning on Different Tasks",
+            "content_type": "text",
+            "page_info": 14
+          }
+        }
+      ],
+      "judge_scores": {
+        "correctness": 55.0,
+        "faithfulness": 95.0,
+        "relevance": 75.0,
+        "overall": 73.0,
+        "reason": "The answer accurately describes BERT but omits the acronym expansion, reducing correctness; all claims are supported by the provided context, giving high faithfulness; it addresses the question partially, yielding moderate relevance."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.2,
+        "recall_at_k": 1.0,
+        "mrr": 0.2,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 10085.79,
+      "error": null
+    },
+    {
+      "question_id": 1,
+      "retrieval": "vector",
+      "llm": "model_2",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "The Transformer architecture is a neural network design that relies almost entirely on self‑attention mechanisms to process sequences.  Its core components and design choices are described in the paper “Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer” (paper_id: 1910.10683) and are illustrated in several figures and sections of the text.\n\n### 1.  Self‑attention as the primary building block  \n- **Self‑attention** replaces each token in a sequence with a weighted average of all tokens in that sequence.  \n- For an output token \\(y_i\\) the weight \\(w_{i,j}\\) is computed from the corresponding input tokens \\(x_i\\) and \\(x_j\\) (Section 3.2).  \n- The attention mask is used to zero out selected weights, thereby controlling which tokens can influence each other.  For example, a causal mask sets \\(w_{i,j}=0\\) when \\(j>i\\) (Figure 3, middle) (paper_id: 1910.10683).\n\n### 2.  Layer structure  \nEach Transformer layer contains:  \n1. **Multi‑head self‑attention** (or encoder‑decoder attention in the decoder).  \n2. **Add‑and‑Norm** (residual connection followed by layer normalization).  \n3. **Position‑wise feed‑forward network** (two linear layers with a ReLU or GELU activation).  \n4. **Add‑and‑Norm** again.  \n\nThese components are stacked \\(L\\) times to form the full model.\n\n### 3.  Masking schemes and architectural variants  \nThe paper explores three main variants, each defined by the pattern of attention masks:\n\n| Variant | Masking pattern | Typical use |\n|---------|-----------------|-------------|\n| **Standard encoder‑decoder** | Encoder: fully‑visible; Decoder: causal; Encoder‑decoder: fully‑visible | Sequence‑to‑sequence tasks (e.g., translation) |\n| **Language model** | Single stack; causal mask applied to the concatenation of input and target | Autoregressive language modeling |\n| **Prefix‑language model** | Single stack; fully‑visible mask over the input prefix, causal mask thereafter | Prefix‑tuning or conditional generation |\n\nThese schematics are shown in Figure 4 of the paper (paper_id: 1910.10683).\n\n### 4.  Pre‑training and fine‑tuning workflow  \nThe baseline model is a standard Transformer (Section 2.1) pre‑trained with a denoising objective.  After pre‑training, the same architecture is fine‑tuned on downstream tasks, keeping the same layer stack and masking configuration (Section 4) (paper_id: 1910.10683).\n\n### 5.  Relation to BERT  \nThe BERT model (paper_id: 1810.04805) is a specific instantiation of the Transformer:  \n- It uses only the **encoder** part of the architecture, i.e., a multi‑layer bidirectional Transformer encoder.  \n- The architecture follows the original Transformer encoder design (Vaswani et al., 2017) with the same self‑attention, feed‑forward, residual, and normalization blocks.  \n- BERTBASE has \\(L=12\\) layers, hidden size \\(H=768\\), and \\(A=12\\) attention heads; BERTLARGE has \\(L=24\\), \\(H=1024\\), and \\(A=16\\) (paper_id: 1810.04805).\n\n---\n\n**In summary**, the Transformer architecture is a stack of identical layers that each perform multi‑head self‑attention followed by a feed‑forward network, with residual connections and layer normalization.  Different masking patterns (fully‑visible, causal, or a mix) give rise to encoder‑decoder, language‑model, or prefix‑language‑model variants.  BERT is a particular case that uses only the encoder stack of this architecture.",
+      "retrieved_documents": [
+        {
+          "id": 416,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.6261,
+          "source": "dense",
+          "content_snippet": "A major distinguishing factor for different architectures is the \"mask\" used by different attention mechanisms in the model. Recall that the self-attention operation in a Transformer takes a sequence ",
+          "metadata": {
+            "content": "A major distinguishing factor for different architectures is the \"mask\" used by different attention mechanisms in the model. Recall that the self-attention operation in a Transformer takes a sequence as input and outputs a new sequence of the same length. Each entry of the output sequence is produced by computing a weighted average of entries of the input sequence. Specifically, let yi refer to the ith element of the output sequence and xj refer to the jth entry of the input sequence. yiis computed as P j w i,jxj , where wi,j is the scalar weight produced by the self-attention mechanism as a function of xi and xj . The attention mask is then used to zero out certain weights in order to constrain which entries of the input can be attended to at a given output timestep. Diagrams of the masks we will consider are shown in Figure 3. For example, the causal mask (Figure 3, middle) sets any wi,j to zero if j > i .",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "3.2.1 Model Structures",
+            "content_type": "text",
+            "page_info": 15
+          }
+        },
+        {
+          "id": 422,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.5844,
+          "source": "dense",
+          "content_snippet": "Figure 4: Schematics of the Transformer architecture variants we consider. In this diagram, blocks represent elements of a sequence and lines represent attention visibility. Different colored groups o",
+          "metadata": {
+            "content": "Figure 4: Schematics of the Transformer architecture variants we consider. In this diagram, blocks represent elements of a sequence and lines represent attention visibility. Different colored groups of blocks indicate different Transformer layer stacks. Dark grey lines correspond to fully-visible masking and light grey lines correspond to causal masking. We use \".\" to denote a special end-of-sequence token that represents the end of a prediction. The input and output sequences are represented as x and y respectively. Left: A standard encoder-decoder architecture uses fullyvisible masking in the encoder and the encoder-decoder attention, with causal masking in the decoder. Middle: A language model consists of a single Transformer layer stack and is fed the concatenation of the input and target, using a causal mask throughout. Right: Adding a prefix to a language model corresponds to allowing fully-visible masking over the input.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "3.2.1 Model Structures",
+            "content_type": "caption",
+            "page_info": 17
+          }
+        },
+        {
+          "id": 366,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.5722,
+          "source": "dense",
+          "content_snippet": "The primary building block of the Transformer is self-attention (Cheng et al. , 2016). Self-attention is a variant of attention (Graves , 2013; Bahdanau et al. , 2015) that processes a sequence by rep",
+          "metadata": {
+            "content": "The primary building block of the Transformer is self-attention (Cheng et al. , 2016). Self-attention is a variant of attention (Graves , 2013; Bahdanau et al. , 2015) that processes a sequence by replacing each element by a weighted average of the rest of the sequence. The original Transformer consisted of an encoder-decoder architecture and was intended for sequence-to-sequence (Sutskever et al. , 2014; Kalchbrenner et al. , 2014) tasks. It has recently also become common to use models consisting of a single Transformer layer stack, with varying forms of self-attention used to produce architectures appropriate for language modeling (Radford et al. , 2018; Al-Rfou et al. , 2019) or classification and span prediction tasks (Devlin et al. , 2018; Yang et al. , 2019). We empirically explore these architectural variants in Section 3.2 .",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "2.1 Model",
+            "content_type": "text",
+            "page_info": 4
+          }
+        },
+        {
+          "id": 396,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.5436,
+          "source": "dense",
+          "content_snippet": "Our goal for our baseline is to reflect typical, modern practice. We pre-train a standard Transformer (described in Section 2.1) using a simple denoising objective and then separately fine-tune on eac",
+          "metadata": {
+            "content": "Our goal for our baseline is to reflect typical, modern practice. We pre-train a standard Transformer (described in Section 2.1) using a simple denoising objective and then separately fine-tune on each of our downstream tasks. We describe the details of this experimental setup in the following subsections.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "3.1 Baseline",
+            "content_type": "text",
+            "page_info": 11
+          }
+        },
+        {
+          "id": 82,
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "paper_id": "1810.04805",
+          "score": 0.539,
+          "source": "dense",
+          "content_snippet": "Model Architecture BERT's model architecture is a multi-layer bidirectional Transformer encoder based on the original implementation described in Vaswani et al. (2017) and released in the tensor2tenso",
+          "metadata": {
+            "content": "Model Architecture BERT's model architecture is a multi-layer bidirectional Transformer encoder based on the original implementation described in Vaswani et al. (2017) and released in the tensor2tensor library. 1 Because the use of Transformers has become common and our implementation is almost identical to the original, we will omit an exhaustive background description of the model architecture and refer readers to Vaswani et al. (2017) as well as excellent guides such as \"The Annotated Transformer.\" 2\nIn this work, we denote the number of layers (i.e., Transformer blocks) as L, the hidden size as H, and the number of self-attention heads as A . 3 We primarily report results on two model sizes: BERTBASE (L=12, H=768, A=12, Total Parameters=110M) and BERTLARGE (L=24, H=1024, A=16, Total Parameters=340M).",
+            "paper_id": "1810.04805",
+            "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+            "year": 2018,
+            "section": "3 BERT",
+            "content_type": "text",
+            "page_info": 3
+          }
+        }
+      ],
+      "judge_scores": {
+        "correctness": 95.0,
+        "faithfulness": 35.0,
+        "relevance": 90.0,
+        "overall": 75.5,
+        "reason": "The answer correctly describes the transformer as attention‑based, matching the ground truth, but adds many details (e.g., feed‑forward layers, residuals, BERT specifics) not present in the retrieved context, reducing faithfulness, while still staying on topic."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 1630.33,
+      "error": null
+    },
+    {
+      "question_id": 2,
+      "retrieval": "vector",
+      "llm": "model_2",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "Self‑attention is a core component of modern transformer‑based neural networks.  \nIt allows every token in a sequence to interact directly with every other token, producing a context‑aware representation for each position. The process can be broken down into the following steps, as described in the cited works:\n\n1. **Linear projections to Query, Key, and Value vectors**  \n   Each input token embedding \\(x_i\\) is linearly transformed into three vectors:  \n   \\[\n   Q_i = W_Q x_i,\\quad K_i = W_K x_i,\\quad V_i = W_V x_i\n   \\]  \n   where \\(W_Q, W_K, W_V\\) are learned weight matrices. These projections are performed for all tokens in parallel.\n\n2. **Scaled dot‑product attention**  \n   For a given query \\(Q_i\\), the attention score with every key \\(K_j\\) is computed as a dot product, scaled by the square root of the dimensionality \\(d_k\\) to keep gradients stable:  \n   \\[\n   \\text{score}_{ij} = \\frac{Q_i \\cdot K_j}{\\sqrt{d_k}}\n   \\]  \n   The scores are then passed through a softmax to obtain a probability distribution over all positions:  \n   \\[\n   \\alpha_{ij} = \\frac{\\exp(\\text{score}_{ij})}{\\sum_{l}\\exp(\\text{score}_{il})}\n   \\]  \n   This distribution indicates how much token \\(i\\) should attend to token \\(j\\).\n\n3. **Weighted sum of values**  \n   The output for token \\(i\\) is a weighted sum of all value vectors, using the attention weights \\(\\alpha_{ij}\\):  \n   \\[\n   \\text{Attention}(Q_i, K, V) = \\sum_{j}\\alpha_{ij} V_j\n   \\]  \n   This produces a new representation that incorporates information from the entire sequence.\n\n4. **Multi‑head attention**  \n   To capture different types of relationships, the above process is performed in parallel across \\(h\\) independent “heads”. Each head has its own set of projection matrices \\((W_Q^h, W_K^h, W_V^h)\\). The outputs of all heads are concatenated and projected once more to the model dimension:  \n   \\[\n   \\text{MultiHead}(Q, K, V) = W_O \\big[ \\text{head}_1 \\, \\| \\, \\dots \\, \\| \\, \\text{head}_h \\big]\n   \\]  \n   where \\(W_O\\) is another learned matrix. This allows the model to jointly attend to information from different representation subspaces at different positions (see the visualizations in “Attention Is All You Need” where heads capture long‑distance dependencies and anaphora resolution).\n\n5. **Residual connection and layer normalization**  \n   The multi‑head attention output is added to its input (a residual connection) and then normalized:  \n   \\[\n   \\text{LayerNorm}(x + \\text{MultiHead}(x, x, x))\n   \\]  \n   This stabilizes training and allows gradients to flow more easily (as described in the encoder architecture of “Attention Is All You Need”).\n\n6. **Position‑wise feed‑forward network**  \n   After the attention sub‑layer, a simple fully‑connected feed‑forward network is applied independently to each position, followed again by a residual connection and layer normalization. The encoder layers in the original transformer stack six such identical layers (each with two sub‑layers) and maintain a model dimension of 512 (or 768 in later variants) (see “Attention Is All You Need”).\n\n7. **Decoder self‑attention**  \n   In the decoder, self‑attention is masked (causal or autoregressive) so that a token can only attend to previous tokens, ensuring that predictions are made sequentially. The decoder then attends to the encoder output via an additional cross‑attention sub‑layer before producing the final output through a dense softmax layer whose weights are tied to the input embedding matrix (as noted in “Exploring the Limits of Transfer Learning with a Unified Text‑to‑Text Transformer”).\n\nIn summary, self‑attention lets each token in a sequence dynamically gather context from all other tokens through learned linear projections, scaled dot‑product weighting, and multi‑head aggregation, all wrapped in residual connections and layer normalization to form the backbone of transformer models.",
+      "retrieved_documents": [
+        {
+          "id": 368,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.6844,
+          "source": "dense",
+          "content_snippet": "3. http://nlp.seas.harvard.edu/2018/04/03/attention.html\n4. http://jalammar.github.io/illustrated-transformer/\nmechanism after each self-attention layer that attends to the output of the encoder. The ",
+          "metadata": {
+            "content": "3. http://nlp.seas.harvard.edu/2018/04/03/attention.html\n4. http://jalammar.github.io/illustrated-transformer/\nmechanism after each self-attention layer that attends to the output of the encoder. The self-attention mechanism in the decoder also uses a form of autoregressive or causal selfattention, which only allows the model to attend to past outputs. The output of the final decoder block is fed into a dense layer with a softmax output, whose weights are shared with the input embedding matrix. All attention mechanisms in the Transformer are split up into independent \"heads\" whose outputs are concatenated before being further processed.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "2.1 Model",
+            "content_type": "text",
+            "page_info": 5
+          }
+        },
+        {
+          "id": 9,
+          "title": "Attention Is All You Need",
+          "paper_id": "1706.03762",
+          "score": 0.6336,
+          "source": "dense",
+          "content_snippet": "Encoder: The encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, positionwise fully",
+          "metadata": {
+            "content": "Encoder: The encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, positionwise fully connected feed-forward network. We employ a residual connection [11] around each of the two sub-layers, followed by layer normalization [1]. That is, the output of each sub-layer is LayerNorm(x + Sublayer(x)), where Sublayer(x) is the function implemented by the sub-layer itself. To facilitate these residual connections, all sub-layers in the model, as well as the embedding layers, produce outputs of dimension dmodel = 512 .",
+            "paper_id": "1706.03762",
+            "title": "Attention Is All You Need",
+            "year": 2017,
+            "section": "3.1 Encoder and Decoder Stacks",
+            "content_type": "text",
+            "page_info": 3
+          }
+        },
+        {
+          "id": 660,
+          "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+          "paper_id": "1910.10683",
+          "score": 0.6053,
+          "source": "dense",
+          "content_snippet": "- Alexei Baevski, Sergey Edunov, Yinhan Liu, Luke Zettlemoyer, and Michael Auli. Clozedriven pretraining of self-attention networks. arXiv preprint arXiv:1903.07785, 2019.\n- Dzmitry Bahdanau, Kyunghyu",
+          "metadata": {
+            "content": "- Alexei Baevski, Sergey Edunov, Yinhan Liu, Luke Zettlemoyer, and Michael Auli. Clozedriven pretraining of self-attention networks. arXiv preprint arXiv:1903.07785, 2019.\n- Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. Neural machine translation by jointly learning to align and translate. In Third International Conference on Learning Representations, 2015.\n- Ankur Bapna, Naveen Arivazhagan, and Orhan Firat. Simple, scalable adaptation for neural machine translation. arXiv preprint arXiv:1909.08478, 2019.\n- Iz Beltagy, Kyle Lo, and Arman Cohan. SciBERT: A pretrained language model for scientific text. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), 2019.",
+            "paper_id": "1910.10683",
+            "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+            "year": 2019,
+            "section": "References",
+            "content_type": "list_item",
+            "page_info": 58
+          }
+        },
+        {
+          "id": 5800,
+          "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+          "paper_id": "2205.14135",
+          "score": 0.5988,
+          "source": "dense",
+          "content_snippet": "- [65] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, et al. Pytorch: An imperative style, highperfor",
+          "metadata": {
+            "content": "- [65] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, et al. Pytorch: An imperative style, highperformance deep learning library. Advances in neural information processing systems, 32, 2019.\n- [66] Markus N Rabe and Charles Staats. Self-attention does not need 𝑂(𝑛 2 ) memory. arXiv preprint arXiv:2112.05682, 2021.\n- [67] Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. Language models are unsupervised multitask learners. OpenAI blog, 1(8):9, 2019.",
+            "paper_id": "2205.14135",
+            "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+            "year": 2022,
+            "section": "References",
+            "content_type": "list_item",
+            "page_info": 14
+          }
+        },
+        {
+          "id": 66,
+          "title": "Attention Is All You Need",
+          "paper_id": "1706.03762",
+          "score": 0.5846,
+          "source": "dense",
+          "content_snippet": "Figure 3: An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the ve",
+          "metadata": {
+            "content": "Figure 3: An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb 'making', completing the phrase 'making...more difficult'. Attentions here shown only for the word 'making'. Different colors represent different heads. Best viewed in color.\nInput-Input Layer5\nFigure 4: Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution. Top: Full attentions for head 5. Bottom: Isolated attentions from just the word 'its' for attention heads 5 and 6. Note that the attentions are very sharp for this word.\nInput-Input Layer5\nFigure 5: Many of the attention heads exhibit behaviour that seems related to the structure of the sentence. We give two such examples above, from two different heads from the encoder self-attention at layer 5 of 6. The heads clearly learned to perform different tasks.",
+            "paper_id": "1706.03762",
+            "title": "Attention Is All You Need",
+            "year": 2017,
+            "section": "Attention Visualizations\r\nInput-Input Laye Attention Visualizations\r\nInput-Input Layer5",
+            "content_type": "caption",
+            "page_info": 15
+          }
+        }
+      ],
+      "judge_scores": {
+        "correctness": 95.0,
+        "faithfulness": 65.0,
+        "relevance": 95.0,
+        "overall": 86.0,
+        "reason": "The answer accurately describes self-attention and matches the ground truth, but adds many details (formulas, residuals, feed‑forward) not present in the retrieved context, lowering faithfulness while remaining highly relevant."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.4,
+        "recall_at_k": 1.0,
+        "mrr": 0.5,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 1634.37,
+      "error": null
+    },
+    {
+      "question_id": 3,
+      "retrieval": "vector",
+      "llm": "model_2",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "BERT is a transformer‑based language model that learns contextualized word representations by training on large unlabeled corpora and then fine‑tuning on downstream tasks. It is built on the encoder stack of the Transformer architecture and uses a bidirectional attention mechanism to capture context from both left and right sides of a token.  \n\nThe name **BERT** stands for **Bidirectional Encoder Representations from Transformers** (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding). The model is first pretrained with two tasks: masked language modeling (MLM) and next‑sentence prediction (NSP). After pretraining, BERT can be fine‑tuned for a variety of natural language processing tasks such as classification, question answering, and token‑labeling by adding a lightweight task‑specific output layer on top of the pretrained encoder (BERT: Pre‑training of Deep Bidirectional Transformers for Language Understanding).",
+      "retrieved_documents": [
+        {
+          "id": 175,
+          "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+          "paper_id": "1907.11692",
+          "score": 0.567,
+          "source": "dense",
+          "content_snippet": "In this section, we describe the experimental setup for our replication study of BERT.",
+          "metadata": {
+            "content": "In this section, we describe the experimental setup for our replication study of BERT.",
+            "paper_id": "1907.11692",
+            "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+            "year": 2019,
+            "section": "3 Experimental Setup",
+            "content_type": "text",
+            "page_info": 2
+          }
+        },
+        {
+          "id": 169,
+          "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+          "paper_id": "1907.11692",
+          "score": 0.5483,
+          "source": "dense",
+          "content_snippet": "BERT takes as input a concatenation of two segments (sequences of tokens), x1, . . . , xN and y1, . . . , yM. Segments usually consist of more than one natural sentence. The two segments are presented",
+          "metadata": {
+            "content": "BERT takes as input a concatenation of two segments (sequences of tokens), x1, . . . , xN and y1, . . . , yM. Segments usually consist of more than one natural sentence. The two segments are presented as a single input sequence to BERT with special tokens delimiting them: [CLS], x1, . . . , xN , [SEP], y1, . . . , yM , [EOS] . M and N are constrained such that M + N < T , where T is a parameter that controls the maximum sequence length during training.\nThe model is first pretrained on a large unlabeled text corpus and subsequently finetuned using end-task labeled data.",
+            "paper_id": "1907.11692",
+            "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+            "year": 2019,
+            "section": "2.1 Setup",
+            "content_type": "text",
+            "page_info": 2
+          }
+        },
+        {
+          "id": 4962,
+          "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+          "paper_id": "2204.04521",
+          "score": 0.5465,
+          "source": "dense",
+          "content_snippet": "PHS-BERT has the same architecture as BERT. BERT was trained on 2 tasks: mask language mod-\nFigure 1: An overview of pretraining, fine-tuning, and the various tasks and datasets used in PHS benchmarki",
+          "metadata": {
+            "content": "PHS-BERT has the same architecture as BERT. BERT was trained on 2 tasks: mask language mod-\nFigure 1: An overview of pretraining, fine-tuning, and the various tasks and datasets used in PHS benchmarking\neling (MLM) (15% of tokens were masked and next sentence prediction (NSP) (Given the first sentence, BERT was trained to predict whether a selected next sentence was likely or not). BERT is pretrained on Wikipedia and BooksCorpus and needs task-specific fine-tuning. Pretrained BERT models include BERTBase (12 layers, 12 attention heads, and 110 million parameters), as well as BERTLarge (24 layers, 16 attention heads, and 340 million parameters).",
+            "paper_id": "2204.04521",
+            "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+            "year": 2022,
+            "section": "3.1 BERT",
+            "content_type": "text",
+            "page_info": 3
+          }
+        },
+        {
+          "id": 4961,
+          "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+          "paper_id": "2204.04521",
+          "score": 0.5406,
+          "source": "dense",
+          "content_snippet": "PHS-BERT has the same architecture as BERT. Fig. 1 illustrates an overview of pretraining, finetuning, and datasets used in this study. We describe BERT and then the pretraining and fine-tuning proces",
+          "metadata": {
+            "content": "PHS-BERT has the same architecture as BERT. Fig. 1 illustrates an overview of pretraining, finetuning, and datasets used in this study. We describe BERT and then the pretraining and fine-tuning process employed in PHS-BERT.",
+            "paper_id": "2204.04521",
+            "title": "Benchmarking for Public Health Surveillance tasks on Social Media with a Domain-Specific Pretrained Language Model",
+            "year": 2022,
+            "section": "3 Method",
+            "content_type": "text",
+            "page_info": 2
+          }
+        },
+        {
+          "id": 153,
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "paper_id": "1810.04805",
+          "score": 0.5389,
+          "source": "dense",
+          "content_snippet": "The illustration of fine-tuning BERT on different tasks can be seen in Figure 4. Our task-specific models are formed by incorporating BERT with one additional output layer, so a minimal number of para",
+          "metadata": {
+            "content": "The illustration of fine-tuning BERT on different tasks can be seen in Figure 4. Our task-specific models are formed by incorporating BERT with one additional output layer, so a minimal number of parameters need to be learned from scratch. Among the tasks, (a) and (b) are sequence-level tasks while (c) and (d) are token-level tasks. In the figure, E represents the input embedding, Ti represents the contextual representation of token i , [CLS] is the special symbol for classification output, and [SEP] is the special symbol to separate non-consecutive token sequences.",
+            "paper_id": "1810.04805",
+            "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+            "year": 2018,
+            "section": "A.5 Illustrations of Fine-tuning on Different Tasks",
+            "content_type": "text",
+            "page_info": 14
+          }
+        }
+      ],
+      "judge_scores": {
+        "correctness": 95.0,
+        "faithfulness": 50.0,
+        "relevance": 95.0,
+        "overall": 81.5,
+        "reason": "The answer correctly defines BERT and expands the acronym, but the expansion is not present in the retrieved context, causing a faithfulness shortfall; otherwise it is accurate and directly addresses the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.2,
+        "recall_at_k": 1.0,
+        "mrr": 0.2,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 1536.87,
+      "error": null
+    },
+    {
+      "question_id": 1,
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "I’m unable to provide a description of the transformer architecture because the supplied context does not contain any information on that topic. Additional details or excerpts about the transformer model would be needed to answer the question.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer does not provide the correct description of the transformer architecture, so correctness and relevance are zero, but it accurately reflects the lack of context, making it fully faithful."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 7013.41,
+      "error": null
+    },
+    {
+      "question_id": 2,
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "I’m unable to provide an answer because the supplied context does not contain any information about self‑attention mechanisms in neural networks. Additional details or excerpts describing self‑attention would be needed to respond accurately.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer provides no correct information about self-attention, but it accurately reflects the lack of retrieved context and does not hallucinate; however, it fails to address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 4879.24,
+      "error": null
+    },
+    {
+      "question_id": 3,
+      "retrieval": "hybrid",
+      "llm": "model_1",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "I’m unable to provide an answer because the necessary information about BERT is not present in the supplied context.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer does not provide the correct information about BERT, though it accurately reflects the absence of context, and it fails to address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 2091.52,
+      "error": null
+    },
+    {
+      "question_id": 1,
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "question": "What is the transformer architecture?",
+      "ground_truth": "The transformer is a neural network architecture based entirely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+      "generated_answer": "I’m sorry, but the provided context does not contain any information about the transformer architecture, so I can’t give a detailed answer.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer provides no correct information about the transformer architecture, though it faithfully reflects the absence of retrieved context, it does not address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 3667.57,
+      "error": null
+    },
+    {
+      "question_id": 2,
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "question": "How does self-attention work in neural networks?",
+      "ground_truth": "Self-attention computes the relationship and compatibility between different positions in a sequence using query, key, and value vectors.",
+      "generated_answer": "I’m sorry, but the provided context does not contain any information about self‑attention in neural networks, so I can’t give a detailed answer based on it.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 0.0,
+        "overall": 30.0,
+        "reason": "The answer does not provide the correct explanation of self‑attention, so correctness and relevance are zero, but it accurately reflects the empty retrieved context, giving full faithfulness."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 359.41,
+      "error": null
+    },
+    {
+      "question_id": 3,
+      "retrieval": "hybrid",
+      "llm": "model_2",
+      "question": "What is BERT and what does it stand for?",
+      "ground_truth": "BERT stands for Bidirectional Encoder Representations from Transformers. It is designed to pre-train deep bidirectional representations from unlabeled text.",
+      "generated_answer": "I’m sorry, but the provided context does not contain any information about BERT, so I can’t answer that question.",
+      "retrieved_documents": [],
+      "judge_scores": {
+        "correctness": 0.0,
+        "faithfulness": 100.0,
+        "relevance": 10.0,
+        "overall": 33.0,
+        "reason": "The answer fails to provide the definition of BERT, so it is completely incorrect; it is faithful to the empty context, but does not address the question."
+      },
+      "retrieval_metrics": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "mrr": 0.0,
+        "annotated": true,
+        "message": null
+      },
+      "execution_time_ms": 1283.62,
+      "error": null
+    }
+  ]
+}

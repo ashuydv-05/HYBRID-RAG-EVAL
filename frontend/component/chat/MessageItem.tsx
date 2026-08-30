@@ -16,26 +16,33 @@ export function MessageItem({ message }: MessageItemProps) {
   const isUser = message.role === 'user';
 
   return (
-    <div className="py-5 px-4 message-enter">
+    <div className="py-4 px-4 message-enter">
       <div className="max-w-3xl mx-auto">
         <div className={`${isUser ? 'flex justify-end' : ''}`}>
           {isUser ? (
-            <div className="max-w-[80%] bg-[#f7f7f8] border border-gray-200 rounded-2xl rounded-tr-sm px-4 py-3 text-gray-800 text-base leading-relaxed break-words">
+            <div className="max-w-[80%] bg-[#f4f2ff] border border-[#e2dcff] rounded-2xl rounded-tr-sm px-4 py-3 text-slate-800 text-sm font-medium leading-relaxed break-words shadow-sm">
               {message.content}
             </div>
           ) : (
             <>
-              <div className={`text-gray-800 text-sm leading-relaxed ${message.isStreaming && message.content ? 'streaming-cursor' : ''}`}>
+              <div
+                className={`text-slate-800 text-sm leading-relaxed ${
+                  message.isStreaming && message.content
+                    ? 'streaming-cursor'
+                    : ''
+                }`}
+              >
                 {message.isStreaming && !message.content ? (
-                  <div className="not-prose flex items-center gap-1 py-2">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                  <div className="not-prose flex items-center gap-1.5 py-2">
+                    <div className="w-2 h-2 bg-[#5542f6] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-2 h-2 bg-[#5542f6] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-2 h-2 bg-[#5542f6] rounded-full animate-bounce" />
                   </div>
                 ) : (
                   <MarkdownRenderer content={message.content} />
                 )}
               </div>
+
               {message.sources && message.sources.length > 0 && (
                 <SourcesSection sources={message.sources} />
               )}
@@ -54,7 +61,10 @@ function MarkdownRenderer({ content }: { content: string }) {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedBlock(blockId);
-      setTimeout(() => setCopiedBlock(null), 2000);
+
+      setTimeout(() => {
+        setCopiedBlock(null);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
@@ -64,34 +74,119 @@ function MarkdownRenderer({ content }: { content: string }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
-        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-        em: ({ children }) => <em className="italic">{children}</em>,
-        h1: ({ children }) => <h1 className="text-2xl font-bold mt-6 mb-3 text-gray-900">{children}</h1>,
-        h2: ({ children }) => <h2 className="text-xl font-semibold mt-5 mb-2 text-gray-900">{children}</h2>,
-        h3: ({ children }) => <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-900">{children}</h3>,
-        h4: ({ children }) => <h4 className="text-base font-semibold mt-3 mb-1 text-gray-900">{children}</h4>,
-        ul: ({ children }) => <ul className="list-disc list-outside pl-5 mb-3 space-y-1">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal list-outside pl-5 mb-3 space-y-1">{children}</ol>,
-        li: ({ children }) => <li className="leading-relaxed pl-1">{children}</li>,
-        blockquote: ({ children }) => (
-          <blockquote className="border-l-4 border-gray-200 pl-4 text-gray-500 my-3">{children}</blockquote>
+        p: ({ children }) => (
+          <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>
         ),
-        hr: () => <hr className="border-gray-200 my-4" />,
+
+        strong: ({ children }) => (
+          <strong className="font-semibold text-gray-900">
+            {children}
+          </strong>
+        ),
+
+        em: ({ children }) => (
+          <em className="italic">{children}</em>
+        ),
+
+        h1: ({ children }) => (
+          <h1 className="text-2xl font-bold mt-6 mb-3 text-gray-900">
+            {children}
+          </h1>
+        ),
+
+        h2: ({ children }) => (
+          <h2 className="text-xl font-semibold mt-5 mb-2 text-gray-900">
+            {children}
+          </h2>
+        ),
+
+        h3: ({ children }) => (
+          <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-900">
+            {children}
+          </h3>
+        ),
+
+        h4: ({ children }) => (
+          <h4 className="text-base font-semibold mt-3 mb-1 text-gray-900">
+            {children}
+          </h4>
+        ),
+
+        ul: ({ children }) => (
+          <ul className="list-disc list-outside pl-5 mb-3 space-y-1">
+            {children}
+          </ul>
+        ),
+
+        ol: ({ children }) => (
+          <ol className="list-decimal list-outside pl-5 mb-3 space-y-1">
+            {children}
+          </ol>
+        ),
+
+        li: ({ children }) => (
+          <li className="leading-relaxed pl-1">{children}</li>
+        ),
+
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-4 border-gray-200 pl-4 text-gray-500 my-3">
+            {children}
+          </blockquote>
+        ),
+
+        hr: () => (
+          <hr className="border-gray-200 my-4" />
+        ),
+
         table: ({ children }) => (
           <div className="overflow-x-auto mb-3">
-            <table className="w-full border-collapse text-sm">{children}</table>
+            <table className="w-full border-collapse text-sm">
+              {children}
+            </table>
           </div>
         ),
-        thead: ({ children }) => <thead className="bg-gray-50">{children}</thead>,
-        th: ({ children }) => <th className="border border-gray-200 px-3 py-2 text-left font-semibold text-gray-700">{children}</th>,
-        td: ({ children }) => <td className="border border-gray-200 px-3 py-2 text-gray-700">{children}</td>,
-        code({ node, inline, className, children, ...props }: ComponentPropsWithoutRef<'code'>) {
+
+        thead: ({ children }) => (
+          <thead className="bg-gray-50">
+            {children}
+          </thead>
+        ),
+
+        th: ({ children }) => (
+          <th className="border border-gray-200 px-3 py-2 text-left font-semibold text-gray-700">
+            {children}
+          </th>
+        ),
+
+        td: ({ children }) => (
+          <td className="border border-gray-200 px-3 py-2 text-gray-700">
+            {children}
+          </td>
+        ),
+
+        /*
+         * IMPORTANT:
+         * Do not use `node` here.
+         *
+         * react-markdown's current TypeScript types do not expose
+         * `node` through ComponentPropsWithoutRef<'code'>.
+         *
+         * The previous version caused:
+         * "Property 'node' does not exist..."
+         */
+        code({
+          inline,
+          className,
+          children,
+          ...props
+        }: ComponentPropsWithoutRef<'code'> & {
+          inline?: boolean;
+        }) {
           const match = /language-(\w+)/.exec(className || '');
+
           const codeString = String(children).replace(/\n$/, '');
-          const blockId = node?.position?.start?.line
-            ? `code-${node.position.start.line}`
-            : `code-${crypto.randomUUID()}`;
+
+          const blockId = `code-${crypto.randomUUID()}`;
 
           if (!inline && match) {
             return (
@@ -100,8 +195,11 @@ function MarkdownRenderer({ content }: { content: string }) {
                   <span className="text-xs text-gray-500 font-medium uppercase">
                     {match[1]}
                   </span>
+
                   <button
-                    onClick={() => handleCopy(codeString, blockId)}
+                    onClick={() =>
+                      handleCopy(codeString, blockId)
+                    }
                     className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
                   >
                     {copiedBlock === blockId ? (
@@ -117,6 +215,7 @@ function MarkdownRenderer({ content }: { content: string }) {
                     )}
                   </button>
                 </div>
+
                 <SyntaxHighlighter
                   style={oneLight}
                   language={match[1]}
@@ -137,21 +236,26 @@ function MarkdownRenderer({ content }: { content: string }) {
           }
 
           return (
-            <code className="bg-gray-100 text-red-500 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+            <code
+              className="bg-gray-100 text-red-500 px-1.5 py-0.5 rounded text-sm font-mono"
+              {...props}
+            >
               {children}
             </code>
           );
         },
+
         pre({ children }) {
           return <>{children}</>;
         },
+
         a({ href, children, ...props }) {
           return (
             <a
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#10a37f] hover:underline"
+              className="text-[#5542f6] font-medium hover:underline"
               {...props}
             >
               {children}
@@ -165,29 +269,44 @@ function MarkdownRenderer({ content }: { content: string }) {
   );
 }
 
-function SourcesSection({ sources }: { sources: Source[] }) {
+function SourcesSection({
+  sources,
+}: {
+  sources: Source[];
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (sources.length === 0) return null;
+  if (sources.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="mt-5 pt-3 border-t border-gray-200">
+    <div className="mt-5 pt-3 border-t border-slate-100">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+        className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-[#5542f6] transition-colors"
       >
         {isExpanded ? (
-          <ChevronDown size={16} />
+          <ChevronDown size={14} />
         ) : (
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         )}
-        <span>{isExpanded ? 'Hide sources' : `Sources (${sources.length})`}</span>
+
+        <span>
+          {isExpanded
+            ? 'Hide sources'
+            : `Sources (${sources.length})`}
+        </span>
       </button>
 
       {isExpanded && (
         <div className="mt-3 grid gap-2">
           {sources.map((source, index) => (
-            <SourceItem key={source.id || index} source={source} index={index} />
+            <SourceItem
+              key={source.id || index}
+              source={source}
+              index={index}
+            />
           ))}
         </div>
       )}
@@ -195,36 +314,53 @@ function SourcesSection({ sources }: { sources: Source[] }) {
   );
 }
 
-function SourceItem({ source, index }: { source: Source; index: number }) {
+function SourceItem({
+  source,
+  index,
+}: {
+  source: Source;
+  index: number;
+}) {
   return (
-    <div className="flex items-start gap-3 p-3 bg-[#f7f7f8] rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200">
-      <div className="flex-shrink-0 w-6 h-6 rounded bg-white flex items-center justify-center shadow-sm">
-        <span className="text-xs font-bold text-[#10a37f]">{index + 1}</span>
+    <div className="flex items-start gap-3 p-3 bg-[#fcfcff] rounded-xl border border-slate-200/80 hover:border-[#5542f6]/30 hover:shadow-sm transition-all duration-200">
+      <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#eeebff] flex items-center justify-center shadow-xs">
+        <span className="text-xs font-bold text-[#5542f6]">
+          {index + 1}
+        </span>
       </div>
+
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-gray-800 truncate">
           {source.title}
         </div>
+
         <div className="flex items-center gap-2 text-xs text-gray-500 mt-1 flex-wrap">
           {source.arxiv_id && (
             <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-gray-200 text-[#10a37f]">
               {source.arxiv_id}
             </span>
           )}
-          {source.year && <span>{source.year}</span>}
-          {source.score > 0 && (
+
+          {source.year && (
+            <span>{source.year}</span>
+          )}
+
+          {source.score !== undefined && source.score > 0 && (
             <span className="text-green-600 font-medium">
               {(source.score * 100).toFixed(0)}% match
             </span>
           )}
         </div>
-        {Array.isArray(source.authors) && source.authors.length > 0 && (
-          <div className="text-xs text-gray-400 mt-1 truncate">
-            {source.authors.slice(0, 3).join(', ')}
-            {source.authors.length > 3 && ' et al.'}
-          </div>
-        )}
+
+        {Array.isArray(source.authors) &&
+          source.authors.length > 0 && (
+            <div className="text-xs text-gray-400 mt-1 truncate">
+              {source.authors.slice(0, 3).join(', ')}
+              {source.authors.length > 3 && ' et al.'}
+            </div>
+          )}
       </div>
+
       {source.pdf_url && (
         <a
           href={source.pdf_url}
@@ -233,7 +369,14 @@ function SourceItem({ source, index }: { source: Source; index: number }) {
           className="flex-shrink-0 text-gray-400 hover:text-[#10a37f] transition-colors p-1"
           title="Open PDF"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M12 2L2 7l10 5 10-5-10-5z" />
             <path d="M2 17l10 5 10-5" />
             <path d="M2 12l10 5 10-5" />
