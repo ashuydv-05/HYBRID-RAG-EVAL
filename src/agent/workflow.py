@@ -108,13 +108,21 @@ class MultiAgentWorkflow:
             "node_timings": {},
         }
 
+        callbacks = []
+        if os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"):
+            try:
+                from langfuse.langchain import CallbackHandler
+                callbacks.append(CallbackHandler())
+            except Exception as e:
+                logger.warning(f"Failed to initialize Langfuse callback: {e}")
+
         try:
             result = self.app.invoke(
                 input_state,
                 config={
                     "configurable": {"thread_id": thread_id},
                     "recursion_limit": 10,
-                    "callbacks": [CallbackHandler()],
+                    "callbacks": callbacks,
                 },
             )
         except NodeInterrupt as e:
