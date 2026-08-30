@@ -9,6 +9,7 @@ from src.agent.vector_search import vector_search_node
 from src.agent.web_search import web_search_node
 from src.agent.validate import validation_node
 from src.agent.gen import gen_node
+import os
 import time
 import uuid
 from langfuse.langchain import CallbackHandler
