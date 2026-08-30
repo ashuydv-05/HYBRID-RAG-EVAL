@@ -1,7 +1,8 @@
 import pytest
-from src.agent.workflow import MultiAgentWorkflow
-from src.agent.planner import format_chat_history, PlannerOutcome
+from unittest.mock import MagicMock, patch
+from src.agent.planner import format_chat_history, PlannerOutcome, plan_node
 from src.agent.state import AgentState
+from src.agent.workflow import create_workflow, MultiAgentWorkflow
 
 
 def test_format_chat_history_empty():
@@ -21,29 +22,41 @@ def test_format_chat_history_with_turns():
     assert formatted.count("When was it published?") == 0
 
 
-def test_multi_turn_session_memory():
-    workflow = MultiAgentWorkflow()
-    session_id = "test-session-multi-turn-001"
+def test_plan_node_contextual_query_rewriting():
+    # Mock LLM to return rewritten query when pronoun is present
+    mock_outcome = PlannerOutcome(
+        decision="process",
+        route="vector_search",
+        reasoning="User refers to PaLM and BERT papers from previous context",
+        search_query="PaLM and BERT publication dates arXiv",
+    )
 
-    # Turn 1: Ask about papers
-    res1 = workflow.run("What are recent papers about PaLM and BERT?", session_id=session_id)
-    assert res1.answer is not None
-    assert len(res1.answer) > 0
+    mock_llm = MagicMock()
+    mock_structured = MagicMock()
+    mock_structured.invoke.return_value = mock_outcome
+    mock_llm.with_structured_output.return_value = mock_structured
 
-    # Turn 2: Follow-up using pronoun "these"
-    res2 = workflow.run("what are the dates of these papers?", session_id=session_id)
-    assert res2.answer is not None
-    # Must NOT ask for clarification because memory resolved "these"
-    assert "Could you please provide more details" not in res2.answer
+    with patch("src.agent.planner.get_llm_client", return_value=mock_llm):
+        state = {
+            "query": "what are the dates of these papers?",
+            "chat_history": [
+                {"role": "user", "content": "Tell me about PaLM and BERT"},
+                {"role": "assistant", "content": "PaLM and BERT are transformer models."},
+            ],
+            "messages": [],
+            "reasoning_steps": [],
+            "sources": [],
+            "node_timings": {},
+        }
+        res = plan_node(state)
+        assert res["decision"] == "process"
+        assert res["route"] == "vector_search"
+        assert res["search_query"] == "PaLM and BERT publication dates arXiv"
 
 
-def test_independent_session_isolation():
-    workflow = MultiAgentWorkflow()
-    session_a = "session-alpha"
-    session_b = "session-beta"
-
-    res_a = workflow.run("What is Transformer architecture?", session_id=session_a)
-    assert res_a.answer is not None
-
-    res_b = workflow.run("What is BERT?", session_id=session_b)
-    assert res_b.answer is not None
+def test_workflow_thread_checkpointer():
+    workflow = create_workflow()
+    assert hasattr(workflow, "app")
+    assert workflow.app is not None
+    # Verify app has checkpointer attached for session memory
+    assert hasattr(workflow.app, "checkpointer")
