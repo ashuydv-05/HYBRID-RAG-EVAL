@@ -138,9 +138,26 @@ class VectorSearch:
         top_k = top_k or self.config.final_k
         prefetch = prefetch or self.config.prefetch_k
         try:
-            dense = self.dense_search(query, top_k=prefetch)
-            bm25 = self.bm25_search(query, top_k=prefetch)
-            rrf_results = self.rrf_fuse([dense, bm25], top_k=self.config.final_k)
+            dense = []
+            try:
+                dense = self.dense_search(query, top_k=prefetch)
+            except Exception as e:
+                logger.warning(f"Dense vector search failed: {e}")
+
+            bm25 = []
+            try:
+                bm25 = self.bm25_search(query, top_k=prefetch)
+            except Exception as e:
+                logger.info(f"BM25 Elasticsearch search skipped/unavailable: {e}")
+
+            if dense and bm25:
+                rrf_results = self.rrf_fuse([dense, bm25], top_k=self.config.final_k)
+            else:
+                rrf_results = dense or bm25
+
+            if not rrf_results:
+                return []
+
             return self.rerank(query, rrf_results, top_k)
         except Exception as e:
             logger.error(f"[VectorSearch] Error: {e}")

@@ -105,7 +105,7 @@ def _gen_rag_answer(
     chat_history: list[dict] | None = None,
 ) -> dict:
     if not document:
-        raise NodeInterrupt("Service temporarily unavailable", id="gen")
+        return _gen_direct_answer(llm, query, existing_timings)
     context = format_documents(document)
 
     user_prompt_content = RAG_USER_TEMPLATE.format(context=context, query=query)
