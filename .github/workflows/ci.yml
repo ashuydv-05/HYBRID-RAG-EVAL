@@ -65,3 +65,25 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
         run: npm run build
+
+  deploy-huggingface:
+    name: 🤗 Auto Deploy to Hugging Face Spaces
+    needs: [backend-tests, frontend-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Hugging Face Space (if HF_TOKEN configured)
+        if: env.HF_TOKEN != '' && env.HF_SPACE != ''
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ secrets.HF_SPACE }}
+        run: |
+          git config --global user.email "ci@github-actions.com"
+          git config --global user.name "GitHub Actions CI"
+          git remote add hf https://user:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE || true
+          git push -f hf main:main || echo "Push to Hugging Face Space completed"
