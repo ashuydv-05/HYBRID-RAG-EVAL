@@ -1,5 +1,8 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:8000/api"
+    : "https://arxiv-rag-backend.onrender.com/api");
 
 export interface ChatRequest {
   message: string;

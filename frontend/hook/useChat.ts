@@ -177,7 +177,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           errorMessage = 'Request was cancelled.';
         } else if (error.message.includes('Failed to fetch')) {
           errorMessage =
-            'Cannot connect to server. Please check that the FastAPI backend is running on port 8000.';
+            'Cannot connect to backend server. Please verify your connection or wait for the server to wake up.';
         } else {
           errorMessage = error.message;
         }
