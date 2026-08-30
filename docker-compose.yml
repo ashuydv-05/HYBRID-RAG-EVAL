@@ -1,45 +1,28 @@
+version: '3.8'
+
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # 1. Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: arxiv_qdrant
     ports:
-      - "8000:8000"
-    environment:
-      - ES_URL=http://elasticsearch:9200
+      - "6333:6333"
+      - "6334:6334"
     volumes:
-      - ./.env:/app/.env
-      - ./src:/app/src
-      - ./script:/app/script
-      - ./data:/app/data
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      qdrant:
-        condition: service_healthy
+      - ./qdrant_storage:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6333/collections || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - arxiv-network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-    depends_on:
-      - backend
-    restart: unless-stopped
-    networks:
-      - arxiv-network
-
+  # 2. Elasticsearch BM25 Keyword Search
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    container_name: arxiv_elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -56,18 +39,41 @@ services:
     networks:
       - arxiv-network
 
-  qdrant:
-    image: qdrant/qdrant:latest
+  # 3. FastAPI & LangGraph Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arxiv_backend
     ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - ./qdrant_storage:/qdrant/storage
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:6333/collections || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - arxiv-network
+
+  # 4. Next.js 14 Web Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: arxiv_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
     restart: unless-stopped
     networks:
       - arxiv-network

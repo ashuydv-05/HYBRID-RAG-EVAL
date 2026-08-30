@@ -1,14 +1,23 @@
+# Frontend Dockerfile - Next.js 14
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy source code
 COPY . .
 
+# Environment configuration
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Build application
+RUN npm run build
+
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# Start production server
+CMD ["npm", "start"]

@@ -1,34 +1,28 @@
-# arXiv Research Assistant - Backend Dockerfile
-FROM python:3.11-slim
+# Backend Dockerfile - FastAPI & LangGraph RAG Service
+FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install uv
-RUN pip install uv
+# Prevent Python from writing .pyc and buffering stdout
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies for docling/rapidocr
+# Install system utilities
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    libgl1 \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    libgomp1 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml and install dependencies with uv
-COPY pyproject.toml .
-RUN uv pip install --system -r pyproject.toml --no-cache
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy source code and scripts
 COPY src/ ./src/
+COPY data/ ./data/
 COPY script/ ./script/
-
-# Create logs directory and set permissions
-RUN mkdir -p /app/log && chmod +x script/docker-entrypoint.sh
 
 EXPOSE 8000
 
-ENTRYPOINT ["script/docker-entrypoint.sh"]
+# Run FastAPI backend with Uvicorn
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
