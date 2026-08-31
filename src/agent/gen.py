@@ -1,5 +1,5 @@
 from langgraph.errors import NodeInterrupt
-from src.config.clients import get_llm_client
+from src.config.clients import get_llm_client, extract_message_text
 from src.agent.state import AgentState
 from src.config.prompt import (
     GENERATE_SYSTEM_PROMPT,
@@ -81,15 +81,16 @@ def _gen_direct_answer(llm, query: str, existing_timings: dict) -> dict:
     response = llm.invoke(messages)
     elapsed = (time.time() - start_time) * 1000
     new_timings = {**existing_timings, "generate": elapsed}
+    answer = extract_message_text(response)
 
     return {
-        "answer": response.content,
+        "answer": answer,
         "source": [],
         "reasoning_step": ["GEN: Direct answer"],
         "chat_history": [
             {
                 "role": "assistant",
-                "content": response.content,
+                "content": answer,
                 "timestamp": datetime.utcnow().isoformat(),
             }
         ],
@@ -130,15 +131,16 @@ def _gen_rag_answer(
     response = llm.invoke(messages)
     elapsed = (time.time() - start_time) * 1000
     new_timings = {**existing_timings, "generate": elapsed}
+    answer = extract_message_text(response)
 
     return {
-        "answer": response.content,
+        "answer": answer,
         "source": document,
         "reasoning_step": [f"GEN: RAG answer ({len(document)} source)"],
         "chat_history": [
             {
                 "role": "assistant",
-                "content": response.content,
+                "content": answer,
                 "timestamp": datetime.utcnow().isoformat(),
             }
         ],

@@ -1,5 +1,4 @@
 from loguru import logger
-from langgraph.errors import NodeInterrupt
 from src.agent.state import AgentState
 from src.retrieval.hybrid_search import VectorSearch
 import time
@@ -30,12 +29,15 @@ def vector_search_node(state: AgentState) -> dict:
 
         return {
             "document": docs_as_dicts,
-            "reasoning_step": state.get("reasoning_step", [])
-            + [
+            "reasoning_step": [
                 f"VECTOR_SEARCH: Retrieved {len(docs_as_dicts)} document for: {query[:50]}..."
             ],
             "node_timings": new_timings,
         }
     except Exception as e:
         logger.error(f"[VectorSearch] Error: {e}")
-        raise NodeInterrupt("Service temporarily unavailable", id="vector_search")
+        return {
+            "document": [],
+            "reasoning_step": [f"VECTOR_SEARCH: Failed ({e})"],
+            "node_timings": {**existing_timings, "vector_search": (time.time() - start_time) * 1000},
+        }

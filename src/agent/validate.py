@@ -1,7 +1,6 @@
 from typing import Literal
 from loguru import logger
 from pydantic import BaseModel
-from langgraph.errors import NodeInterrupt
 from src.config.clients import get_llm_client
 from src.agent.state import AgentState
 from src.config.prompt import VALIDATE_SYSTEM_PROMPT, VALIDATE_HUMAN_TEMPLATE
@@ -68,4 +67,11 @@ def validation_node(state: AgentState) -> dict:
         }
     except Exception as e:
         logger.error(f"[Validate] Error: {e}")
-        raise NodeInterrupt("Service temporarily unavailable", id="validate")
+        return {
+            "document": document,
+            "validation_result": "relevant" if document else "insufficient",
+            "reasoning_step": [
+                f"VALIDATE: Assumed {'relevant' if document else 'insufficient'} after grader error ({e})"
+            ],
+            "node_timings": {**existing_timings, "validate": (time.time() - start_time) * 1000},
+        }

@@ -3,6 +3,9 @@ from loguru import logger
 from src.api.dependencies import get_workflow
 from src.agent.workflow import MultiAgentWorkflow
 from src.api.models import HealthCheck
+from src.config.clients import get_qdrant_client
+from src.config.settings import settings
+
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -20,14 +23,21 @@ async def health_check(
     except Exception as e:
         logger.warning(f"Health check failed: {e}")
         components["workflow"] = "unhealthy"
-    all_healthy = all(
-        (
-            status == "healthy" or status == "not_configured"
-            for status in components.values()
-        )
-    )
+
+    try:
+        client = get_qdrant_client()
+        info = client.get_collection(settings.qdrant.collection)
+        points = getattr(info, "points_count", 0) or 0
+        components["qdrant"] = "healthy" if points > 0 else "empty"
+        components["qdrant_points"] = str(points)
+    except Exception as e:
+        logger.warning(f"Qdrant health check failed: {e}")
+        components["qdrant"] = "unhealthy"
+
+    qdrant_ok = components.get("qdrant") == "healthy"
+    workflow_ok = components.get("workflow") == "healthy"
     return HealthCheck(
-        status="healthy" if all_healthy else "degraded",
+        status="healthy" if qdrant_ok and workflow_ok else "degraded",
         version="2.0.0",
         components=components,
     )

@@ -176,11 +176,11 @@ The system includes an automated evaluation suite testing **2 Retrieval Strategi
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/AI-research-assistant-chatbot.git
-cd AI-research-assistant-chatbot
+git clone https://github.com/ashuydv-05/HYBRID-RAG-EVAL.git
+cd HYBRID-RAG-EVAL
 
-# Make runner script executable
-chmod +x run.sh
+# Make scripts executable
+chmod +x start.sh run.sh
 ```
 
 ### 3. Configure Environment
@@ -193,7 +193,7 @@ cp .env.example .env
 Edit `.env` with your API keys:
 ```env
 GROQ_API_KEY=gsk_your_groq_api_key_here
-GROQ_MODEL=qwen/qwen3.8-27b
+GROQ_MODEL=openai/gpt-oss-120b
 GROQ_MODEL_2=openai/gpt-oss-20b
 
 # Optional: For Gemini LLM-as-Judge
@@ -201,24 +201,33 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.0-flash
 ```
 
-### 4. Master Runner Commands (`run.sh`)
+### 4. 🚀 1-Click Startup
 
-Use the included [`run.sh`](file:///Users/ashuyadav/Desktop/HYBRID%20RAG/AI-research-assistant-chatbot/run.sh) script to control the entire project:
+Start the complete application stack (Databases + Backend + Frontend) with one command:
 
 ```bash
-# 🚀 1. Start the Full Application Stack (Backend :8000 + Frontend :3000)
-./run.sh app
+# 🚀 1-Click Complete System Launcher
+./start.sh
 
-# 📊 2. Run the Automated 2×2 Evaluation Benchmark
+# (Or alternatively)
+./run.sh
+```
+
+### 5. 🛠️ Master CLI Commands (`run.sh`)
+
+Use the included [`run.sh`](file:///Users/ashuyadav/Desktop/HYBRID%20RAG/run.sh) script to control specific subsystems:
+
+```bash
+# 📊 1. Run the Automated 2×2 Evaluation Benchmark
 ./run.sh eval --max-questions 5
 
-# 🧪 3. Run the Automated Test Suite (38 unit & integration tests)
+# 🧪 2. Run the Automated Test Suite (34 unit & integration tests)
 ./run.sh test
 
-# 📦 4. Index arXiv Papers into Elasticsearch (BM25 setup)
+# 📦 3. Index arXiv Papers into Elasticsearch (BM25 setup)
 ./run.sh index
 
-# 🐳 5. Start Docker Databases (Qdrant & Elasticsearch)
+# 🐳 4. Start Docker Databases (Qdrant & Elasticsearch)
 ./run.sh docker
 ```
 
@@ -234,13 +243,12 @@ Once running:
 | Variable | Default | Description |
 |---|---|---|
 | `GROQ_API_KEY` | - | Primary Groq API Key for fast LLM inference |
-| `GROQ_MODEL` | `qwen/qwen3.8-27b` | Primary generation model (LLM 1) |
+| `GROQ_MODEL` | `openai/gpt-oss-120b` | Primary generation model (LLM 1) |
 | `GROQ_MODEL_2` | `openai/gpt-oss-20b` | Baseline comparison model (LLM 2) |
 | `GEMINI_API_KEY` | - | *(Optional)* Google Gemini API Key for LLM Judge |
 | `GEMINI_MODEL` | `gemini-2.0-flash` | *(Optional)* Gemini model for evaluation |
-| `QDRANT_HOST` | `localhost` | Qdrant vector database host |
-| `QDRANT_PORT` | `6333` | Qdrant vector database port |
-| `ELASTICSEARCH_URL` | `http://localhost:9200` | Elasticsearch service URL for BM25 |
+| `QDRANT_URL` | `http://localhost:6333` | Qdrant vector database URL |
+| `ES_URL` | `http://localhost:9200` | Elasticsearch service URL for BM25 |
 | `TAVILY_API_KEY` | - | *(Optional)* Tavily Web Search API key for fallback |
 
 ---
@@ -249,6 +257,7 @@ Once running:
 
 ```
 .
+├── start.sh                        # 🚀 1-Click full stack system launcher
 ├── run.sh                          # Master CLI runner (app, eval, test, index, docker)
 ├── docker-compose.yml              # Qdrant & Elasticsearch database containers
 ├── data/

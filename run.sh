@@ -25,6 +25,8 @@ print_banner() {
 activate_venv() {
     if [ -d ".venv" ]; then
         source .venv/bin/activate
+        export PATH="$PROJECT_DIR/.venv/bin:$PATH"
+        export VIRTUAL_ENV="$PROJECT_DIR/.venv"
     else
         echo -e "${RED}Error: Virtual environment .venv not found. Please set up Python venv first.${NC}"
         exit 1
@@ -36,8 +38,21 @@ start_docker() {
     if ! docker info > /dev/null 2>&1; then
         echo -e "${YELLOW}Warning: Docker is not running. Please open Docker Desktop.${NC}"
     else
-        docker compose up -d qdrant elasticsearch
-        echo -e "${GREEN}✓ Qdrant (:6333) and Elasticsearch (:9200) are running.${NC}"
+        QDRANT_OK=false
+        ES_OK=false
+        if curl -s http://localhost:6333/collections > /dev/null 2>&1; then
+            QDRANT_OK=true
+        fi
+        if curl -s http://localhost:9200 > /dev/null 2>&1; then
+            ES_OK=true
+        fi
+
+        if [ "$QDRANT_OK" = true ] && [ "$ES_OK" = true ]; then
+            echo -e "${GREEN}✓ Qdrant (:6333) and Elasticsearch (:9200) are already running and healthy.${NC}"
+        else
+            docker compose up -d qdrant elasticsearch
+            echo -e "${GREEN}✓ Qdrant (:6333) and Elasticsearch (:9200) are running.${NC}"
+        fi
     fi
 }
 
@@ -60,7 +75,7 @@ run_eval() {
 run_tests() {
     activate_venv
     echo -e "${BLUE}▶ Running full test suite with pytest...${NC}"
-    pytest test/test_retrievers.py test/test_llm_clients.py test/test_evaluation.py test/test_workflow.py test/test_api.py -v
+    python -m pytest test/test_retrievers.py test/test_llm_clients.py test/test_evaluation.py test/test_workflow.py test/test_api.py -v
 }
 
 run_app() {
@@ -105,8 +120,8 @@ show_help() {
     echo ""
 }
 
-# Main command router
-COMMAND="${1:-help}"
+# Main command router (defaults to starting the full application)
+COMMAND="${1:-app}"
 shift 1 2>/dev/null || true
 
 case "$COMMAND" in

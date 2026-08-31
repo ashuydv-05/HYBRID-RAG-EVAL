@@ -5,7 +5,6 @@ from typing import Any
 
 from loguru import logger
 from qdrant_client import QdrantClient
-from qdrant_client import models as qdrant_models
 from elasticsearch import Elasticsearch
 
 from src.config.clients import get_qdrant_client, get_es_client
@@ -63,30 +62,44 @@ class VectorSearch:
             cls.embed_model = SentenceTransformer(settings.embedding.dense_model)
         return cls.embed_model
 
+    def _to_search_results(self, points, source: str = "dense") -> list[SearchResult]:
+        results = []
+        for p in points:
+            payload = p.payload or {}
+            point_id = p.id
+            try:
+                numeric_id = int(point_id)
+            except (TypeError, ValueError):
+                numeric_id = abs(hash(str(point_id))) % (10**9)
+            results.append(
+                SearchResult(
+                    id=numeric_id,
+                    content=payload.get("content", ""),
+                    title=payload.get("title") or payload.get("section") or "Unknown",
+                    score=p.score or 0.0,
+                    source=source,
+                    metadata=payload,
+                )
+            )
+        return results
+
     def dense_search(self, query: str, top_k: int = 50) -> list[SearchResult]:
+        """Query Qdrant with a locally embedded vector.
+
+        Server-side Document inference works from a laptop, but Render often cannot
+        use Qdrant Cloud inference. Local MiniLM embeddings match how points were stored.
+        """
         collection = settings.qdrant.collection
-        dense_model = settings.embedding.dense_model
         dense_name = settings.embedding.dense_vector_name
+        query_vector = self.get_embed_model().encode(query).tolist()
         points = self.qdrant.query_points(
             collection_name=collection,
-            query=qdrant_models.Document(text=query, model=dense_model),
+            query=query_vector,
             using=dense_name,
             limit=top_k,
             with_payload=True,
         ).points
-        return [
-            SearchResult(
-                id=int(p.id),
-                content=p.payload.get("content", "") if p.payload else "",
-                title=p.payload.get("title") or p.payload.get("section", "Unknown")
-                if p.payload
-                else "Unknown",
-                score=p.score or 0.0,
-                source="dense",
-                metadata=p.payload,
-            )
-            for p in points
-        ]
+        return self._to_search_results(points, source="dense")
 
     def bm25_search(self, query: str, top_k: int = 50) -> list[SearchResult]:
         if self.es is None:
@@ -162,9 +175,13 @@ class VectorSearch:
                 rrf_results = dense or bm25
 
             if not rrf_results:
+                logger.warning("[VectorSearch] No dense or BM25 hits for query")
                 return []
 
-            return self.rerank(query, rrf_results, top_k)
+            rerank_enabled = os.getenv("RERANKER_ENABLED", "false").lower() == "true"
+            if rerank_enabled:
+                return self.rerank(query, rrf_results, top_k)
+            return rrf_results[:top_k]
         except Exception as e:
             logger.error(f"[VectorSearch] Error: {e}")
             return []

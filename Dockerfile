@@ -9,6 +9,8 @@ ENV PYTHONUNBUFFERED=1
 ENV HF_HOME=/app/.cache/huggingface
 ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 ENV TORCH_HOME=/app/.cache/torch
+ENV RERANKER_ENABLED=false
+ENV GROQ_MAX_TOKENS=8192
 
 # Install system utilities
 RUN apt-get update && apt-get install -y --no-install-recommends \

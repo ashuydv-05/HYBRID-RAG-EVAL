@@ -1,10 +1,10 @@
-import os
 import time
 from fastapi import APIRouter, Depends, HTTPException, Header
 from loguru import logger
 from src.agent.workflow import MultiAgentWorkflow, WorkflowOutcome
 from src.api.dependencies import get_workflow
 from src.api.models import ChatRequest, ChatResponse, ReasoningStep, Source
+from src.config.clients import request_groq_api_key, get_llm_client, extract_message_text
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 STEP_MAP = {
@@ -56,10 +56,8 @@ async def chat(
     workflow: MultiAgentWorkflow = Depends(get_workflow),
     x_groq_api_key: str | None = Header(None, alias="x-groq-api-key"),
 ) -> ChatResponse:
-    if x_groq_api_key and x_groq_api_key.strip():
-        os.environ["GROQ_API_KEY"] = x_groq_api_key.strip()
-    elif request.groq_api_key and request.groq_api_key.strip():
-        os.environ["GROQ_API_KEY"] = request.groq_api_key.strip()
+    header_key = (x_groq_api_key or request.groq_api_key or "").strip()
+    token = request_groq_api_key.set(header_key or None)
 
     session_id = request.session_id or generate_session_id()
     logger.info(
@@ -75,17 +73,23 @@ async def chat(
             f"[API] Workflow completed. Sources count: {len(result.source)}, Reasoning steps: {len(result.reasoning_step)}"
         )
         answer = result.answer
-        if not answer or not answer.strip():
+        if not answer or not str(answer).strip():
             logger.warning("[API] Workflow returned empty answer, generating fallback response...")
             try:
-                from src.config.clients import get_llm_client
                 llm = get_llm_client()
-                if llm:
-                    direct_resp = llm.invoke(f"You are an expert AI academic research assistant. Please answer this query thoroughly: {request.message}")
-                    answer = direct_resp.content
+                direct_resp = llm.invoke(
+                    f"You are an expert AI academic research assistant. Please answer this query thoroughly: {request.message}"
+                )
+                answer = extract_message_text(direct_resp)
             except Exception as ex:
                 logger.error(f"[API] Fallback generation error: {ex}")
-                answer = "I processed your request, but was unable to formulate a complete answer. Please try rephrasing."
+                answer = ""
+            if not answer:
+                steps = "; ".join(result.reasoning_step[-3:]) if result.reasoning_step else "no agent steps"
+                answer = (
+                    "I could not complete retrieval-backed generation for this question. "
+                    f"Last agent steps: {steps}. Check Qdrant connectivity and Groq model output."
+                )
 
         execution_time = (time.time() - start_time) * 1000
         return ChatResponse(
@@ -101,3 +105,5 @@ async def chat(
         raise HTTPException(
             status_code=500, detail=f"Failed to process request: {str(e)}"
         )
+    finally:
+        request_groq_api_key.reset(token)

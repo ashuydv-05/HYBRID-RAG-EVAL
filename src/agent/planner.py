@@ -1,7 +1,6 @@
 from typing import Literal, Optional
 from loguru import logger
 from pydantic import BaseModel
-from langgraph.errors import NodeInterrupt
 from src.config.clients import get_llm_client
 from src.agent.state import AgentState
 from src.config.prompt import PLANNER_PROMPT_TEMPLATE
@@ -90,5 +89,13 @@ def plan_node(state: AgentState) -> dict:
             "node_timings": new_timings,
         }
     except Exception as e:
-        logger.error(f"[Planner] Error: {e}")
-        raise NodeInterrupt("Service temporarily unavailable", id="planner")
+        logger.error(f"[Planner] Structured route failed, defaulting to vector_search: {e}")
+        return {
+            "decision": "process",
+            "route": "vector_search",
+            "search_query": query,
+            "reasoning_step": [
+                f"PLANNER: Fallback to vector_search after planner error ({e})"
+            ],
+            "node_timings": {**existing_timings, "planner": (time.time() - start_time) * 1000},
+        }
